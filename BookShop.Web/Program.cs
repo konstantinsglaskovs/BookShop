@@ -1,9 +1,25 @@
+using BookShop.Application;
+using BookShop.Infrastructure;
+using BookShop.Infrastructure.Identity;
+using Mapster;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddMapster();
+
 builder.Services.AddControllersWithViews();
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+
+using var scope = app.Services.CreateScope();
+
+var roleSeeder =
+    scope.ServiceProvider.GetRequiredService<RoleSeeder>();
+
+await roleSeeder.SeedAsync();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -12,6 +28,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 
 app.UseHttpsRedirection();
 app.UseRouting();

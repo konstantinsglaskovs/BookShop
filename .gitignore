@@ -57,3 +57,5 @@ TestResult.xml
 nunit-*.xml
 /BookShop.Web/appsettings.Development.json
 .vs
+/docker-compose.yml
+/s3.json

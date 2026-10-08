@@ -1,4 +1,5 @@
-﻿using BookShop.Domain.Entities;
+﻿using BookShop.Application.Сommon.Interfaces;
+using BookShop.Domain.Entities;
 using BookShop.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -6,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookShop.Infrastructure.Persistance;
 
-public class AppDbContext: IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+public class AppDbContext: IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>, IAppDbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options): base(options)
     {
@@ -31,6 +32,7 @@ public class AppDbContext: IdentityDbContext<ApplicationUser, IdentityRole<Guid>
 
     public DbSet<UserProfile> UserProfiles { get; set; }
 
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -39,10 +41,40 @@ public class AppDbContext: IdentityDbContext<ApplicationUser, IdentityRole<Guid>
 
         modelBuilder.Entity<BookTag>().HasKey(x => new { x.BookId, x.TagId });
 
+        modelBuilder.Entity<BookTag>()
+            .HasOne(bookTag => bookTag.Book)
+            .WithMany(book => book.BookTags)
+            .HasForeignKey(bookTag => bookTag.BookId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BookTag>()
+            .HasOne(bookTag => bookTag.Tag)
+            .WithMany(tag => tag.BookTags)
+            .HasForeignKey(bookTag => bookTag.TagId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<ApplicationUser>()
             .HasOne(x => x.UserProfile)
             .WithOne()
             .HasForeignKey<UserProfile>(x => x.ApplicationUserId);
+
+        modelBuilder.Entity<BookAuthor>()
+            .HasOne(bookAuthor => bookAuthor.Book)
+            .WithMany(book => book.BookAuthors)
+            .HasForeignKey(bookAuthor => bookAuthor.BookId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BookAuthor>()
+            .HasOne(bookAuthor => bookAuthor.Author)
+            .WithMany(author => author.BookAuthors)
+            .HasForeignKey(bookAuthor => bookAuthor.AuthorId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BookImage>()
+            .HasOne(image => image.Book)
+            .WithMany(book => book.Images)
+            .HasForeignKey(image => image.BookId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
 }

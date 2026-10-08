@@ -1,4 +1,6 @@
-﻿namespace BookShop.Domain.Entities;
+﻿using BookShop.Domain.Enums;
+
+namespace BookShop.Domain.Entities;
 
 public class Book
 {
@@ -8,6 +10,7 @@ public class Book
     public string? ISBN { get; set; }
     public decimal Price { get; set; }
     public int StockQuantity { get; set; }
+    public BookStatus Status { get; set; } = BookStatus.Active;
     public Guid CategoryId { get; set; }
     public Category Category { get; set; } = null!;
 

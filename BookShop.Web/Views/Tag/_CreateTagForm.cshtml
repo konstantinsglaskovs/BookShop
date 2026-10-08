@@ -1,0 +1,40 @@
+﻿@model BookShop.Web.Models.Tags.CreateTagViewModel
+
+<form asp-controller="Tag"
+      asp-action="Create"
+      method="post"
+      class="inline-form">
+
+    <div class="form-group">
+
+        <label asp-for="Name"
+               class="form-label">
+            Tag name
+        </label>
+
+        <input asp-for="Name"
+               class="form-control"
+               placeholder="For example: Bestseller" />
+
+        <span asp-validation-for="Name"
+              class="field-validation-error">
+        </span>
+
+    </div>
+
+    <div class="form-group">
+
+        <label class="form-label form-label--hidden">
+            Action
+        </label>
+
+        <button type="submit"
+                class="btn btn-primary">
+
+            <i class="bi bi-plus-lg"></i>
+            Add tag
+        </button>
+
+    </div>
+
+</form>

@@ -1,0 +1,228 @@
+﻿@using BookShop.Application.Tags.Dtos
+@using BookShop.Application.Сommon.Models
+@using BookShop.Web.Models.Tags
+
+@model PagedResult<TagDto>
+
+@{
+    ViewData["Title"] = "Tags";
+}
+
+<div class="page-header">
+    <h1 class="page-title">Tags</h1>
+
+    <p class="page-description">
+        Add and manage book tags.
+    </p>
+</div>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-circle"></i>
+        @error
+    </div>
+}
+
+<div class="card form-card">
+    <partial name="_CreateTagForm"
+             model="new CreateTagViewModel()" />
+</div>
+
+<div class="category-toolbar mt-3">
+
+    <form asp-action="Index"
+          method="get"
+          class="list-search">
+
+        <input type="text"
+               name="search"
+               value="@Context.Request.Query["search"]"
+               class="form-control"
+               placeholder="Search tags..." />
+
+        <button type="submit"
+                class="btn btn-primary">
+
+            <i class="bi bi-search"></i>
+            Search
+        </button>
+
+    </form>
+
+    <div class="text-muted">
+        @Model.TotalCount tags
+    </div>
+
+</div>
+
+
+<div class="card mt-2">
+
+    <div class="table-wrapper">
+
+        <table class="table">
+
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th class="table-actions">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if (Model.Items.Count == 0)
+                {
+                    <tr>
+                        <td colspan="2"
+                            class="empty-state">
+                            No tags found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var tag in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                <form asp-controller="Tag"
+                                      asp-action="Update"
+                                      method="post"
+                                      class="inline-edit-form"
+                                      id="tag-form-@tag.Id">
+
+                                    <input type="hidden"
+                                           name="Id"
+                                           value="@tag.Id" />
+
+                                    <input type="text"
+                                           name="Name"
+                                           value="@tag.Name"
+                                           class="inline-edit-input"
+                                           readonly />
+
+                                </form>
+                            </td>
+
+                            <td class="table-actions">
+
+                                <div class="table-actions__group">
+
+                                    <button type="button"
+                                            class="btn btn-secondary btn-sm inline-edit-toggle"
+                                            data-form-id="tag-form-@tag.Id">
+
+                                        <i class="bi bi-pencil"></i>
+                                        <span>Update</span>
+                                    </button>
+
+                                    <form asp-controller="Tag"
+                                          asp-action="Delete"
+                                          method="post">
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@tag.Id" />
+
+                                        <button type="submit"
+                                                class="btn btn-danger btn-sm">
+
+                                            <i class="bi bi-trash"></i>
+                                            Delete
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+                        </tr>
+                    }
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="pagination mt-3">
+
+        @if (Model.Page > 1)
+        {
+            <a asp-action="Index"
+               asp-route-page="@(Model.Page - 1)"
+               asp-route-search="@Context.Request.Query["search"]"
+               class="btn btn-secondary">
+
+                <i class="bi bi-chevron-left"></i>
+                Previous
+            </a>
+        }
+
+        <span class="pagination__info">
+            Page @Model.Page of @Model.TotalPages
+        </span>
+
+        @if (Model.Page < Model.TotalPages)
+        {
+            <a asp-action="Index"
+               asp-route-page="@(Model.Page + 1)"
+               asp-route-search="@Context.Request.Query["search"]"
+               class="btn btn-secondary">
+
+                Next
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        }
+
+    </nav>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.querySelectorAll('.inline-edit-toggle')
+            .forEach(button => {
+
+                button.addEventListener('click', () => {
+
+                    const formId = button.dataset.formId;
+                    const form = document.getElementById(formId);
+                    const input = form.querySelector('.inline-edit-input');
+
+                    const isEditing =
+                        button.dataset.editing === 'true';
+
+                    if (!isEditing) {
+                        input.removeAttribute('readonly');
+
+                        input.focus();
+                        input.select();
+
+                        button.dataset.editing = 'true';
+
+                        button.innerHTML = `
+                                    <i class="bi bi-check-lg"></i>
+                                    <span>Save</span>
+                                `;
+
+                        button.classList.remove('btn-secondary');
+                        button.classList.add('btn-success');
+
+                        return;
+                    }
+
+                    form.requestSubmit();
+                });
+
+            });
+    </script>
+}

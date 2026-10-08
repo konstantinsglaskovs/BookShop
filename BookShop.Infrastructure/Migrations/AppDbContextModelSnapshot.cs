@@ -61,6 +61,9 @@ namespace BookShop.Infrastructure.Migrations
                     b.Property<Guid>("PublisherId")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
                     b.Property<int>("StockQuantity")
                         .HasColumnType("integer");
 

@@ -1,0 +1,93 @@
+﻿<header class="site-header">
+    <div class="container">
+
+        <div class="site-header__inner">
+
+            <a asp-controller="Books"
+               asp-action="Index"
+               class="site-logo">
+
+                <i class="bi bi-book-half site-logo__icon"></i>
+
+                <span class="site-logo__text">
+                    Bookshop
+                </span>
+            </a>
+
+            <form asp-controller="Books"
+                  asp-action="Index"
+                  method="get"
+                  class="site-search">
+
+                <input type="text"
+                       name="Search"
+                       class="site-search__input"
+                       placeholder="Search by title or author..." />
+
+                <button type="submit"
+                        class="site-search__button"
+                        aria-label="Search">
+
+                    <i class="bi bi-search"></i>
+
+                </button>
+
+            </form>
+
+            <nav class="site-nav">
+
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a href="#"
+                       class="site-nav__link">
+
+                        <i class="bi bi-person"></i>
+
+                        <span>Profile</span>
+                    </a>
+
+                    <form asp-controller="Account"
+                          asp-action="Logout"
+                          method="post">
+
+                        <button type="submit"
+                                class="site-nav__link site-nav__button">
+
+                            <i class="bi bi-box-arrow-right"></i>
+
+                            <span>Sign out</span>
+                        </button>
+
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Account"
+                       asp-action="Login"
+                       class="site-nav__link">
+
+                        <i class="bi bi-person"></i>
+
+                        <span>Sign in</span>
+                    </a>
+                }
+
+                <a href="#"
+                   class="site-nav__link site-cart">
+
+                    <i class="bi bi-cart3"></i>
+
+                    <span>Cart</span>
+
+                    <span class="site-cart__count">
+                        0
+                    </span>
+
+                </a>
+
+            </nav>
+
+        </div>
+
+    </div>
+</header>

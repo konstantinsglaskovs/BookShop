@@ -69,6 +69,12 @@ public class AppDbContext: IdentityDbContext<ApplicationUser, IdentityRole<Guid>
             .WithMany(author => author.BookAuthors)
             .HasForeignKey(bookAuthor => bookAuthor.AuthorId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BookImage>()
+            .HasOne(image => image.Book)
+            .WithMany(book => book.Images)
+            .HasForeignKey(image => image.BookId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
 }

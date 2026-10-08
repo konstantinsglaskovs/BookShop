@@ -17,5 +17,11 @@ public interface IAppDbContext
 
     DbSet<Book> Books { get; }
 
+    DbSet<BookImage> BookImages { get; }
+
+    DbSet<OrderItem> OrderItems { get; }
+    DbSet<CartItem> CartItems { get; }
+    DbSet<Order> Orders { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

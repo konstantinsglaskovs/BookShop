@@ -1,4 +1,5 @@
 ﻿using BookShop.Application.Publishers.Dtos;
+using BookShop.Application.Сommon.Extensions;
 using BookShop.Application.Сommon.Interfaces;
 using BookShop.Application.Сommon.Models;
 using MediatR;
@@ -23,7 +24,7 @@ public class GetPublishersQueryHandler:IRequestHandler<GetPublishersQuery, Paged
         {
             var search = request.Search.Trim();
 
-            query = query.Where(publisher => publisher.Name.Contains(search));
+            query = query.Where(publisher => publisher.Name.Contains(search.ToNormalizedTitleCase()));
         }
 
         var totalCount = await query.CountAsync(cancellationToken);

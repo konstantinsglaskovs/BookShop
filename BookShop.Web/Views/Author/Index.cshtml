@@ -1,0 +1,175 @@
+﻿@using BookShop.Application.Authors.Dtos
+@using BookShop.Application.Сommon.Models
+
+@model PagedResult<AuthorListItemDto>
+
+@{
+    ViewData["Title"] = "Authors";
+}
+
+<div class="page-header">
+    <div class="page-header__row">
+        <div>
+            <h1 class="page-title">Authors</h1>
+            <p class="page-description">
+                Manage book authors.
+            </p>
+        </div>
+
+        <a asp-controller="Author"
+           asp-action="Create"
+           class="btn btn-primary">
+
+            <i class="bi bi-plus-lg"></i>
+            Add author
+        </a>
+    </div>
+</div>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-circle"></i>
+        @error
+    </div>
+}
+
+<div class="category-toolbar">
+
+    <form asp-action="Index"
+          method="get"
+          class="list-search">
+
+        <input type="text"
+               name="search"
+               value="@Context.Request.Query["search"]"
+               class="form-control"
+               placeholder="Search authors..." />
+
+        <button type="submit"
+                class="btn btn-primary">
+
+            <i class="bi bi-search"></i>
+            Search
+        </button>
+
+    </form>
+
+    <div class="text-muted">
+        @Model.TotalCount authors
+    </div>
+
+</div>
+
+<div class="card mt-2">
+
+    <div class="table-wrapper">
+
+        <table class="table">
+
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th class="table-actions">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if (Model.Items.Count == 0)
+                {
+                    <tr>
+                        <td colspan="2"
+                            class="empty-state">
+                            No authors found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var author in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                @author.Name
+                            </td>
+
+                            <td class="table-actions">
+
+                                <div class="table-actions__group">
+
+                                    <a asp-controller="Author"
+                                       asp-action="Edit"
+                                       asp-route-id="@author.Id"
+                                       class="btn btn-secondary btn-sm">
+
+                                        <i class="bi bi-pencil"></i>
+                                        Update
+                                    </a>
+
+                                    <form asp-controller="Author"
+                                          asp-action="Delete"
+                                          method="post">
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@author.Id" />
+
+                                        <button type="submit"
+                                                class="btn btn-danger btn-sm">
+
+                                            <i class="bi bi-trash"></i>
+                                            Delete
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+                        </tr>
+                    }
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="pagination mt-3">
+
+        @if (Model.Page > 1)
+        {
+            <a asp-action="Index"
+               asp-route-page="@(Model.Page - 1)"
+               asp-route-search="@Context.Request.Query["search"]"
+               class="btn btn-secondary">
+
+                <i class="bi bi-chevron-left"></i>
+                Previous
+            </a>
+        }
+
+        <span class="pagination__info">
+            Page @Model.Page of @Model.TotalPages
+        </span>
+
+        @if (Model.Page < Model.TotalPages)
+        {
+            <a asp-action="Index"
+               asp-route-page="@(Model.Page + 1)"
+               asp-route-search="@Context.Request.Query["search"]"
+               class="btn btn-secondary">
+
+                Next
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        }
+
+    </nav>
+}

@@ -1,0 +1,40 @@
+﻿@model BookShop.Web.Models.Publishers.CreatePublisherViewModel
+
+<form asp-controller="Publisher"
+      asp-action="Create"
+      method="post"
+      class="inline-form">
+
+    <div class="form-group">
+
+        <label asp-for="Name"
+               class="form-label">
+            Publisher name
+        </label>
+
+        <input asp-for="Name"
+               class="form-control"
+               placeholder="For example: Penguin Books" />
+
+        <span asp-validation-for="Name"
+              class="field-validation-error">
+        </span>
+
+    </div>
+
+    <div class="form-group">
+
+        <label class="form-label form-label--hidden">
+            Action
+        </label>
+
+        <button type="submit"
+                class="btn btn-primary">
+
+            <i class="bi bi-plus-lg"></i>
+            Add publisher
+        </button>
+
+    </div>
+
+</form>

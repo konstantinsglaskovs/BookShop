@@ -1,6 +1,8 @@
 ﻿using BookShop.Application.Books.Dtos;
+using BookShop.Application.Сommon.Extensions;
 using BookShop.Application.Сommon.Interfaces;
 using BookShop.Application.Сommon.Models;
+using BookShop.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,44 +22,38 @@ public class GetBooksQueryHandler : IRequestHandler<GetBooksQuery, PagedResult<B
 
     public async Task<PagedResult<BookListItemDto>> Handle(GetBooksQuery request,CancellationToken cancellationToken)
     {
-        var query = _db.Books.AsNoTracking().AsQueryable();
+        var query = _db.Books.AsNoTracking().Where(book => book.Status == BookStatus.Active);
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
-            var search = request.Search.Trim();
+            var search = request.Search.Trim().ToLower();
 
-            query = query.Where(book => book.Title.Contains(search));
+            query = query.Where(book =>
+                book.Title.ToLower().Contains(search) ||
+                book.BookAuthors.Any(bookAuthor => bookAuthor.Author.Name.ToLower().Contains(search)));
         }
 
         if (request.CategoryIds.Count > 0)
         {
-            var categoryIds = request.CategoryIds.Distinct().ToList();
-
-            query = query.Where(book => categoryIds.Contains(book.CategoryId));
+            query = query.Where(book => request.CategoryIds.Contains(book.CategoryId));
         }
 
         if (request.PublisherIds.Count > 0)
         {
-            var publisherIds = request.PublisherIds.Distinct().ToList();
-
-            query = query.Where(book => publisherIds.Contains(book.PublisherId));
+            query = query.Where(book => request.PublisherIds.Contains(book.PublisherId));
         }
 
         if (request.AuthorIds.Count > 0)
         {
-            var authorIds = request.AuthorIds.Distinct().ToList();
-
-            query = query.Where(book => book.BookAuthors.Any(bookAuthor => authorIds.Contains(bookAuthor.AuthorId)));
+            query = query.Where(book => book.BookAuthors.Any(bookAuthor => request.AuthorIds.Contains(bookAuthor.AuthorId)));
         }
 
         if (request.TagIds.Count > 0)
         {
-            var tagIds = request.TagIds.Distinct().ToList();
-
-            query = query.Where(book => book.BookTags.Any(bookTag => tagIds.Contains(bookTag.TagId)));
+            query = query.Where(book => book.BookTags.Any(bookTag => request.TagIds.Contains(bookTag.TagId)));
         }
 
-        var totalCount = await query.CountAsync(cancellationToken);
+        var totalCount = await query.CountAsync();
 
         var books = await query
             .OrderBy(book => book.Title)
@@ -69,23 +65,24 @@ public class GetBooksQueryHandler : IRequestHandler<GetBooksQuery, PagedResult<B
                 Title = book.Title,
                 Price = book.Price,
 
-                Authors = book.BookAuthors.Select(bookAuthor => bookAuthor.Author.Name).ToList(),
+                Authors = book.BookAuthors
+                    .Select(bookAuthor => bookAuthor.Author.Name)
+                    .ToList(),
 
-                ImageUrl = book.Images.OrderBy(image => image.DisplayOrder)
+                ImageStorageKey = book.Images
+                    .OrderBy(image => image.DisplayOrder)
                     .Select(image => image.StorageKey)
-                    .FirstOrDefault()!
+                    .FirstOrDefault()
             }).ToListAsync();
 
-        var items = books.Select(book => new BookListItemDto
+        foreach (var book in books)
         {
-            Id = book.Id,
-            Title = book.Title,
-            Price = book.Price,
-            Authors = book.Authors,
+            if (book.ImageStorageKey is not null)
+            {
+                book.ImageUrl =_fileStorage.GetPublicUrl(book.ImageStorageKey);
+            }
+        }
 
-            ImageUrl = _fileStorage.GetPublicUrl(book.ImageUrl)
-        })
-        .ToList();
 
         return new PagedResult<BookListItemDto>
         {

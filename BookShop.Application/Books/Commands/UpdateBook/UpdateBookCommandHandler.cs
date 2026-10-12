@@ -9,10 +9,12 @@ namespace BookShop.Application.Books.Commands.UpdateBook;
 public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand, ErrorOr<Guid>>
 {
     private readonly IAppDbContext _db;
+    private readonly IFileStorage _fileStorage;
 
-    public UpdateBookCommandHandler(IAppDbContext db)
+    public UpdateBookCommandHandler(IAppDbContext db, IFileStorage fileStorage)
     {
         _db = db;
+        _fileStorage = fileStorage;
     }
 
     public async Task<ErrorOr<Guid>> Handle(UpdateBookCommand request, CancellationToken cancellationToken)
@@ -64,6 +66,34 @@ public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand, Error
             }
         }
 
+        var existingImages = await _db.BookImages.Where(image => image.BookId == book.Id).ToListAsync();
+
+        var requestedExistingImageIds = request.Images.Where(image =>image.ExistingImageId != Guid.Empty)
+            .Select(image => image.ExistingImageId).ToList();
+
+        if (requestedExistingImageIds.Count != requestedExistingImageIds.Distinct().Count())
+        {
+            return Error.Validation(code: "Book.DuplicateImage",description: "The same image cannot be used more than once.");
+        }
+
+        var existingImageIds = existingImages.Select(image => image.Id).ToHashSet();
+
+        if (requestedExistingImageIds.Any(id => !existingImageIds.Contains(id)))
+        {
+            return Error.Validation(code: "Book.ImageNotFound",description: "One or more images were not found.");
+        }
+
+        foreach (var slot in request.Images)
+        {
+            if (slot.ExistingImageId != Guid.Empty && slot.NewImage is not null)
+            {
+                return Error.Validation(code: "Book.InvalidImageSlot",description: "An image slot cannot contain both an existing and a new image.");
+            }
+        }
+
+
+
+
         book.Title = request.Title.Trim();
 
         book.Description = string.IsNullOrWhiteSpace(request.Description)? null: request.Description.Trim();
@@ -100,7 +130,56 @@ public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand, Error
             });
         }
 
-        await _db.SaveChangesAsync(cancellationToken);
+        var imagesToDelete = existingImages.Where(image =>!requestedExistingImageIds.Contains(image.Id)).ToList();
+
+        foreach (var image in imagesToDelete)
+        {
+            var deleteResult = await _fileStorage.DeleteAsync(image.StorageKey);
+
+            if (deleteResult.IsError)
+            {
+                return deleteResult.Errors;
+            }
+        }
+
+        _db.BookImages.RemoveRange(imagesToDelete);
+
+        for (var i = 0; i < request.Images.Count; i++)
+        {
+            var slot = request.Images[i];
+
+            if (slot.ExistingImageId != Guid.Empty)
+            {
+                var image = existingImages.First(image =>image.Id == slot.ExistingImageId);
+
+                image.DisplayOrder = i;
+
+                continue;
+            }
+
+            if (slot.NewImage is null)
+            {
+                continue;
+            }
+
+            var storageKey =$"books/{book.Id}/{Guid.NewGuid()}{slot.NewImage.FileExtension}";
+
+            var uploadResult = await _fileStorage.UploadAsync(slot.NewImage.Stream,storageKey,slot.NewImage.ContentType);
+
+            if (uploadResult.IsError)
+            {
+                return uploadResult.Errors;
+            }
+
+            _db.BookImages.Add(new BookImage
+            {
+                BookId = book.Id,
+                StorageKey = storageKey,
+                DisplayOrder = i
+            });
+        }
+
+        await _db.SaveChangesAsync();
 
         return book.Id;
 

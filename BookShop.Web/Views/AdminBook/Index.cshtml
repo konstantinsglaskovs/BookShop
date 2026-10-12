@@ -1,0 +1,188 @@
+﻿@using BookShop.Domain.Enums
+@using BookShop.Web.Models.Books
+@model AdminBooksIndexViewModel
+
+@{
+    ViewData["Title"] = "Books management";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Books management</h1>
+
+        <p class="page-description">
+            Manage books in the store.
+        </p>
+    </div>
+</div>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">
+        @error
+    </div>
+}
+
+<div class="admin-books-toolbar">
+
+    <form asp-controller="AdminBook"
+          asp-action="Index"
+          method="get"
+          class="admin-search">
+
+        <div class="admin-search__field">
+            <i class="bi bi-search"></i>
+
+            <input type="text"
+                   name="search"
+                   value="@Model.Search"
+                   class="form-control"
+                   placeholder="Search by title or author..." />
+        </div>
+
+        <button type="submit"
+                class="btn btn-primary">
+            Search
+        </button>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Search))
+        {
+            <a asp-controller="AdminBook"
+               asp-action="Index"
+               class="btn btn-secondary">
+                Clear
+            </a>
+        }
+
+    </form>
+
+    <a asp-controller="AdminBook"
+       asp-action="Create"
+       class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i>
+        Add book
+    </a>
+
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Status</th>
+                    <th class="table-actions">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if (Model.Books.Count == 0)
+                {
+                    <tr>
+                        <td colspan="4"
+                            class="admin-books-empty">
+                            No books found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var book in Model.Books)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@book.Title</strong>
+                            </td>
+
+                            <td>
+                                @string.Join(", ", book.Authors)
+                            </td>
+
+                            <td>
+                                @if (book.Status == BookStatus.Active)
+                                {
+                                    <span class="status-badge status-badge--active">
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge status-badge--inactive">
+                                        Inactive
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="table-actions">
+                                <div class="table-actions__group">
+
+                                    <a asp-controller="AdminBook"
+                                       asp-action="Edit"
+                                       asp-route-id="@book.Id"
+                                       class="btn btn-secondary btn-sm">
+                                        <i class="bi bi-pencil"></i>
+                                        Edit
+                                    </a>
+
+                                    <form asp-controller="AdminBook"
+                                          asp-action="Delete"
+                                          asp-route-id="@book.Id"
+                                          method="post">
+
+                                        <button type="submit"
+                                                class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Delete this book?');">
+                                            <i class="bi bi-trash"></i>
+                                            Delete
+                                        </button>
+
+                                    </form>
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="pagination">
+
+        @if (Model.Page > 1)
+        {
+            <a asp-controller="AdminBook"
+               asp-action="Index"
+               asp-route-page="@(Model.Page - 1)"
+               asp-route-search="@Model.Search"
+               class="btn btn-secondary">
+                Previous
+            </a>
+        }
+
+        <span class="pagination__info">
+            Page @Model.Page of @Model.TotalPages
+        </span>
+
+        @if (Model.Page < Model.TotalPages)
+        {
+            <a asp-controller="AdminBook"
+               asp-action="Index"
+               asp-route-page="@(Model.Page + 1)"
+               asp-route-search="@Model.Search"
+               class="btn btn-secondary">
+                Next
+            </a>
+        }
+
+    </nav>
+}

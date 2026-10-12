@@ -2,6 +2,6 @@
 
 public class BookImageDto
 {
-    public string StorageKey { get; set; } = null!;
+    public string ImageUrl { get; set; } = null!;
     public int DisplayOrder { get; set; }
 }

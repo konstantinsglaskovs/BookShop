@@ -17,10 +17,7 @@ public class S3FileStorage:IFileStorage
         _options = options.Value;
     }
 
-    public async Task<ErrorOr<Success>> UploadAsync(
-        Stream stream,
-        string storageKey,
-        string contentType)
+    public async Task<ErrorOr<Success>> UploadAsync(Stream stream,string storageKey,string contentType)
     {
         try
         {

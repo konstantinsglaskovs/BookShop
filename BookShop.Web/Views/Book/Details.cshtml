@@ -1,0 +1,218 @@
+﻿@model BookShop.Web.Models.Books.BookDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Title;
+
+    var mainImage = Model.Images
+        .OrderBy(x => x.DisplayOrder)
+        .FirstOrDefault();
+}
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/book-details.css"
+          asp-append-version="true" />
+}
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a asp-controller="Book"
+       asp-action="Index">
+        Books
+    </a>
+
+    <i class="bi bi-chevron-right"></i>
+
+    <a asp-controller="Book"
+       asp-action="Index"
+       asp-route-categoryIds="@Model.CategoryId">
+        @Model.CategoryName
+    </a>
+
+    <i class="bi bi-chevron-right"></i>
+
+    <span>
+        @Model.Title
+    </span>
+</nav>
+<div class="book-details">
+
+    <div class="book-details__gallery">
+
+        @if (mainImage is not null)
+        {
+            <div class="book-details__main-image">
+                <img id="mainBookImage"
+                     src="@mainImage.ImageUrl"
+                     alt="@Model.Title" />
+            </div>
+
+            @if (Model.Images.Count > 1)
+            {
+                <div class="book-details__thumbnails">
+
+                    @foreach (var image in Model.Images.OrderBy(x => x.DisplayOrder))
+                    {
+                        <button type="button"
+                                class="book-details__thumbnail"
+                                data-image-url="@image.ImageUrl">
+
+                            <img src="@image.ImageUrl"
+                                 alt="@Model.Title" />
+
+                        </button>
+                    }
+
+                </div>
+            }
+        }
+
+    </div>
+
+    <div class="book-details__content">
+
+        <h1 class="book-details__title">
+            @Model.Title
+        </h1>
+
+        <div class="book-details__authors">
+            by @string.Join(", ", Model.Authors)
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <div class="book-details__description-wrapper">
+
+                <div id="bookDescription"
+                     class="book-details__description">
+                    @Model.Description
+                </div>
+
+                <button type="button"
+                        id="descriptionToggle"
+                        class="book-details__description-toggle"
+                        hidden>
+                    Show more
+                </button>
+
+            </div>
+        }
+
+        <div class="book-details__price">
+            €@Model.Price.ToString("0.00")
+        </div>
+
+        @if (Model.StockQuantity > 0)
+        {
+            <div class="book-details__stock book-details__stock--available">
+                <i class="bi bi-circle-fill"></i>
+                In stock
+            </div>
+        }
+        else
+        {
+            <div class="book-details__stock book-details__stock--unavailable">
+                <i class="bi bi-circle-fill"></i>
+                Out of stock
+            </div>
+        }
+
+        @if (Model.StockQuantity > 0)
+        {
+            <button type="button"
+                    class="btn btn-primary book-details__cart-button">
+
+                <i class="bi bi-cart3"></i>
+                Add to cart
+            </button>
+        }
+
+        <div class="book-details__meta">
+
+            <div class="book-details__meta-row">
+                <span>Category</span>
+                <strong>@Model.CategoryName</strong>
+            </div>
+
+            <div class="book-details__meta-row">
+                <span>Publisher</span>
+                <strong>@Model.PublisherName</strong>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.ISBN))
+            {
+                <div class="book-details__meta-row">
+                    <span>ISBN</span>
+                    <strong>@Model.ISBN</strong>
+                </div>
+            }
+
+        </div>
+
+        @if (Model.Tags.Count > 0)
+        {
+            <div class="book-details__tags">
+
+                @foreach (var tag in Model.Tags)
+                {
+                    <span class="book-details__tag">
+                        @tag
+                    </span>
+                }
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.book-details__thumbnail')
+            .forEach(button => {
+
+                button.addEventListener('click', () => {
+
+                    const mainImage =
+                        document.getElementById('mainBookImage');
+
+                    mainImage.src =
+                        button.dataset.imageUrl;
+
+                    document.querySelectorAll('.book-details__thumbnail')
+                        .forEach(x =>
+                            x.classList.remove(
+                                'book-details__thumbnail--active'));
+
+                    button.classList.add(
+                        'book-details__thumbnail--active');
+                });
+
+            });
+
+        const description =
+            document.getElementById('bookDescription');
+
+        const descriptionToggle =
+            document.getElementById('descriptionToggle');
+
+        if (description && descriptionToggle) {
+
+            if (description.scrollHeight > description.clientHeight) {
+                descriptionToggle.hidden = false;
+            }
+
+            descriptionToggle.addEventListener('click', () => {
+
+                const expanded =
+                    description.classList.toggle(
+                        'book-details__description--expanded');
+
+                descriptionToggle.textContent =
+                    expanded
+                        ? 'Show less'
+                        : 'Show more';
+            });
+        }
+    </script>
+}

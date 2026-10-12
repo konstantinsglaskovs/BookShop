@@ -1,6 +1,9 @@
 using BookShop.Application;
 using BookShop.Infrastructure;
 using BookShop.Infrastructure.Identity;
+using BookShop.Web.Validators.Images;
+using FileSignatures;
+using FileSignatures.Formats;
 using Mapster;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +13,12 @@ builder.Services.AddMapster();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddApplication();
+builder.Services.AddScoped<ImageFileValidator>();
 builder.Services.AddInfrastructure(builder.Configuration);
+
+var imageFormats = FileFormatLocator.GetFormats().OfType<Image>();
+var fileFormatInspector = new FileFormatInspector(imageFormats);
+builder.Services.AddSingleton<IFileFormatInspector>(fileFormatInspector);
 
 var app = builder.Build();
 

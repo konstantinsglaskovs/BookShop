@@ -1,0 +1,39 @@
+﻿.is-hidden {
+    display: none !important;
+}
+
+.book-image-edit__existing {
+    position: relative;
+    cursor: default;
+}
+
+.book-image-edit__preview {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.book-image-edit__remove {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--color-error);
+    color: white;
+    cursor: pointer;
+}
+
+    .book-image-edit__remove:hover {
+        opacity: 0.9;
+    }
+.book-images-error {
+    display: block;
+    margin-top: 12px;
+}

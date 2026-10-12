@@ -1,0 +1,507 @@
+﻿@model BookShop.Web.Models.Books.BooksIndexViewModel
+
+@{
+    ViewData["Title"] = "Books";
+}
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/book-index.css"
+          asp-append-version="true" />
+}
+
+<div class="page-header">
+    <h1 class="page-title">Books</h1>
+
+    <p class="page-description">
+        Find a book and open its details.
+    </p>
+</div>
+
+<form asp-controller="Book"
+      asp-action="Index"
+      method="get"
+      class="catalog-filters">
+
+    <div class="catalog-filters__grid">
+
+        <div class="form-group">
+            <label class="form-label">
+                Categories
+            </label>
+
+            <div class="multi-picker">
+
+                <div class="multi-picker__selected"></div>
+
+                <div class="multi-picker__field">
+
+                    <div class="multi-picker__control">
+
+                        <i class="bi bi-search multi-picker__search-icon"></i>
+
+                        <input type="text"
+                               class="multi-picker__input"
+                               placeholder="Select categories..." />
+
+                        <i class="bi bi-chevron-down multi-picker__arrow"></i>
+
+                    </div>
+
+                    <div class="multi-picker__dropdown">
+
+                        <div class="multi-picker__options">
+
+                            @foreach (var category in ViewBag.Categories)
+                            {
+                                var isChecked =
+                                    Model.CategoryIds.Contains((Guid)category.Id);
+
+                                <label class="multi-picker__option">
+
+                                    <input type="checkbox"
+                                           name="CategoryIds"
+                                           value="@category.Id"
+                                           data-label="@category.Name"
+                                           checked="@isChecked" />
+
+                                    <span>@category.Name</span>
+
+                                </label>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                Publishers
+            </label>
+
+            <div class="multi-picker">
+
+                <div class="multi-picker__selected"></div>
+
+                <div class="multi-picker__field">
+
+                    <div class="multi-picker__control">
+
+                        <i class="bi bi-search multi-picker__search-icon"></i>
+
+                        <input type="text"
+                               class="multi-picker__input"
+                               placeholder="Select publishers..." />
+
+                        <i class="bi bi-chevron-down multi-picker__arrow"></i>
+
+                    </div>
+
+                    <div class="multi-picker__dropdown">
+
+                        <div class="multi-picker__options">
+
+                            @foreach (var publisher in ViewBag.Publishers)
+                            {
+                                var isChecked =
+                                    Model.PublisherIds.Contains((Guid)publisher.Id);
+
+                                <label class="multi-picker__option">
+
+                                    <input type="checkbox"
+                                           name="PublisherIds"
+                                           value="@publisher.Id"
+                                           data-label="@publisher.Name"
+                                           checked="@isChecked" />
+
+                                    <span>@publisher.Name</span>
+
+                                </label>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                Authors
+            </label>
+
+            <div class="multi-picker">
+
+                <div class="multi-picker__selected"></div>
+
+                <div class="multi-picker__field">
+
+                    <div class="multi-picker__control">
+
+                        <i class="bi bi-search multi-picker__search-icon"></i>
+
+                        <input type="text"
+                               class="multi-picker__input"
+                               placeholder="Select authors..." />
+
+                        <i class="bi bi-chevron-down multi-picker__arrow"></i>
+
+                    </div>
+
+                    <div class="multi-picker__dropdown">
+
+                        <div class="multi-picker__options">
+
+                            @foreach (var author in ViewBag.Authors)
+                            {
+                                var isChecked =
+                                    Model.AuthorIds.Contains((Guid)author.Id);
+
+                                <label class="multi-picker__option">
+
+                                    <input type="checkbox"
+                                           name="AuthorIds"
+                                           value="@author.Id"
+                                           data-label="@author.Name"
+                                           checked="@isChecked" />
+
+                                    <span>@author.Name</span>
+
+                                </label>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                Tags
+            </label>
+
+            <div class="multi-picker">
+
+                <div class="multi-picker__selected"></div>
+
+                <div class="multi-picker__field">
+
+                    <div class="multi-picker__control">
+
+                        <i class="bi bi-search multi-picker__search-icon"></i>
+
+                        <input type="text"
+                               class="multi-picker__input"
+                               placeholder="Select tags..." />
+
+                        <i class="bi bi-chevron-down multi-picker__arrow"></i>
+
+                    </div>
+
+                    <div class="multi-picker__dropdown">
+
+                        <div class="multi-picker__options">
+
+                            @foreach (var tag in ViewBag.Tags)
+                            {
+                                var isChecked =
+                                    Model.TagIds.Contains((Guid)tag.Id);
+
+                                <label class="multi-picker__option">
+
+                                    <input type="checkbox"
+                                           name="TagIds"
+                                           value="@tag.Id"
+                                           data-label="@tag.Name"
+                                           checked="@isChecked" />
+
+                                    <span>@tag.Name</span>
+
+                                </label>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="catalog-filters__actions">
+
+        <button type="submit"
+                class="btn btn-primary">
+            Apply filters
+        </button>
+
+        <a asp-controller="Book"
+           asp-action="Index"
+           class="catalog-filters__clear">
+            Clear filters
+        </a>
+
+        <span class="catalog-filters__count">
+            @Model.TotalCount books
+        </span>
+
+    </div>
+
+</form>
+
+@if (Model.Books.Count == 0)
+{
+    <div class="empty-state card">
+        No books found.
+    </div>
+}
+else
+{
+    <div class="book-grid">
+
+        @foreach (var book in Model.Books)
+        {
+            <article class="book-card card">
+
+                <a asp-controller="Book"
+                   asp-action="Details"
+                   asp-route-id="@book.Id"
+                   class="book-card__image-link">
+
+                    @if (!string.IsNullOrWhiteSpace(book.ImageUrl))
+                    {
+                        <img src="@book.ImageUrl"
+                             alt="@book.Title"
+                             class="book-card__image" />
+                    }
+
+                </a>
+
+                <div class="book-card__content">
+
+                    <a asp-controller="Book"
+                       asp-action="Details"
+                       asp-route-id="@book.Id"
+                       class="book-card__title">
+                        @book.Title
+                    </a>
+
+                    <div class="book-card__authors">
+                        @string.Join(", ", book.Authors)
+                    </div>
+
+                    <div class="book-card__footer">
+
+                        <div class="book-card__price">
+                            €@book.Price.ToString("0.00")
+                        </div>
+
+                        <button type="button"
+                                class="btn btn-primary btn-icon"
+                                title="Add to cart">
+                            <i class="bi bi-cart3"></i>
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </article>
+        }
+
+    </div>
+}
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="pagination mt-3">
+
+        @if (Model.Page > 1)
+        {
+            <button type="submit"
+                    form="pagination-form"
+                    name="Page"
+                    value="@(Model.Page - 1)"
+                    class="btn btn-secondary">
+                Previous
+            </button>
+        }
+
+        <span class="pagination__info">
+            Page @Model.Page of @Model.TotalPages
+        </span>
+
+        @if (Model.Page < Model.TotalPages)
+        {
+            <button type="submit"
+                    form="pagination-form"
+                    name="Page"
+                    value="@(Model.Page + 1)"
+                    class="btn btn-secondary">
+                Next
+            </button>
+        }
+
+    </nav>
+
+    <form id="pagination-form"
+          asp-controller="Book"
+          asp-action="Index"
+          method="get"
+          hidden>
+
+        <input type="hidden"
+               name="Search"
+               value="@Model.Search" />
+
+        @foreach (var id in Model.CategoryIds)
+        {
+            <input type="hidden"
+                   name="CategoryIds"
+                   value="@id" />
+        }
+
+        @foreach (var id in Model.PublisherIds)
+        {
+            <input type="hidden"
+                   name="PublisherIds"
+                   value="@id" />
+        }
+
+        @foreach (var id in Model.AuthorIds)
+        {
+            <input type="hidden"
+                   name="AuthorIds"
+                   value="@id" />
+        }
+
+        @foreach (var id in Model.TagIds)
+        {
+            <input type="hidden"
+                   name="TagIds"
+                   value="@id" />
+        }
+
+    </form>
+}
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.multi-picker')
+            .forEach(picker => {
+
+                const input =
+                    picker.querySelector('.multi-picker__input');
+
+                const options =
+                    picker.querySelectorAll('.multi-picker__option');
+
+                const checkboxes =
+                    picker.querySelectorAll(
+                        '.multi-picker__option input[type="checkbox"]');
+
+                const selectedContainer =
+                    picker.querySelector('.multi-picker__selected');
+
+                input.addEventListener('focus', () => {
+                    picker.classList.add('multi-picker--open');
+                });
+
+                input.addEventListener('input', () => {
+
+                    picker.classList.add('multi-picker--open');
+
+                    const search =
+                        input.value.trim().toLowerCase();
+
+                    options.forEach(option => {
+
+                        const text =
+                            option.textContent
+                                .trim()
+                                .toLowerCase();
+
+                        option.style.display =
+                            text.includes(search)
+                                ? 'flex'
+                                : 'none';
+                    });
+                });
+
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener(
+                        'change',
+                        renderSelected);
+                });
+
+                function renderSelected() {
+
+                    selectedContainer.innerHTML = '';
+
+                    const checked =
+                        Array.from(checkboxes)
+                            .filter(x => x.checked);
+
+                    checked.forEach(checkbox => {
+
+                        const chip =
+                            document.createElement('span');
+
+                        chip.className =
+                            'multi-picker__chip';
+
+                        chip.innerHTML = `
+                                    <span>${checkbox.dataset.label}</span>
+                                    <button type="button">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                `;
+
+                        chip.querySelector('button')
+                            .addEventListener('click', () => {
+
+                                checkbox.checked = false;
+
+                                renderSelected();
+                            });
+
+                        selectedContainer.appendChild(chip);
+                    });
+                }
+
+                document.addEventListener(
+                    'click',
+                    event => {
+
+                        if (!picker.contains(event.target)) {
+
+                            picker.classList.remove(
+                                'multi-picker--open');
+
+                            input.value = '';
+
+                            options.forEach(option => {
+                                option.style.display = 'flex';
+                            });
+                        }
+                    });
+
+                renderSelected();
+            });
+    </script>
+}

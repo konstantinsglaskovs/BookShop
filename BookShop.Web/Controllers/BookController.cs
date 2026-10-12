@@ -1,10 +1,10 @@
-﻿using BookShop.Application.Authors.Queries.GetAuthors;
+﻿using BookShop.Application.Books.Commands.CreateBook;
+using BookShop.Application.Books.Queries.GetBookById;
 using BookShop.Application.Books.Queries.GetBookFilterOptions;
 using BookShop.Application.Books.Queries.GetBooks;
-using BookShop.Application.Categories.Queries.GetCategories;
-using BookShop.Application.Publishers.Queries.GetPublishers;
-using BookShop.Application.Tags.Queries.GetTags;
+using BookShop.Application.Сommon.Models;
 using BookShop.Web.Models.Books;
+using BookShop.Web.Validators.Images;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,6 +13,7 @@ namespace BookShop.Web.Controllers;
 public class BookController : Controller
 {
     private readonly IMediator _mediator;
+    
 
     public BookController(IMediator mediator)
     {
@@ -22,20 +23,19 @@ public class BookController : Controller
     [HttpGet]
     public async Task<IActionResult> Index(BooksIndexViewModel model)
     {
-        var booksResult = await _mediator.Send(new GetBooksQuery
+        var books = await _mediator.Send(new GetBooksQuery
         {
             Search = model.Search,
             CategoryIds = model.CategoryIds,
             PublisherIds = model.PublisherIds,
             AuthorIds = model.AuthorIds,
             TagIds = model.TagIds,
-            Page = model.Page,
-            PageSize = 6
+            Page = model.Page
         });
 
-        var filters = await _mediator.Send(new GetBookFilterOptionsQuery());
+        await LoadBookOptions();
 
-        model.Books = booksResult.Items
+        model.Books = books.Items
             .Select(book => new BookListItemViewModel
             {
                 Id = book.Id,
@@ -43,40 +43,66 @@ public class BookController : Controller
                 Price = book.Price,
                 Authors = book.Authors,
                 ImageUrl = book.ImageUrl
-            })
-            .ToList();
-
-        model.Categories = filters.Categories
-            .Select(x => new BookFilterOptionViewModel
-            {
-                Id = x.Id,
-                Name = x.Name
             }).ToList();
 
-        model.Publishers = filters.Publishers
-            .Select(x => new BookFilterOptionViewModel
-            {
-                Id = x.Id,
-                Name = x.Name
-            }).ToList();
-
-        model.Authors = filters.Authors
-            .Select(x => new BookFilterOptionViewModel
-            {
-                Id = x.Id,
-                Name = x.Name
-            }).ToList();
-
-        model.Tags = filters.Tags
-            .Select(x => new BookFilterOptionViewModel
-            {
-                Id = x.Id,
-                Name = x.Name
-            }).ToList();
-
-        model.TotalCount = booksResult.TotalCount;
-        model.TotalPages = booksResult.TotalPages;
+        model.TotalCount = books.TotalCount;
+        model.TotalPages = books.TotalPages;
+        model.Page = books.Page;
 
         return View(model);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Details(Guid id)
+    {
+        var result = await _mediator.Send(
+            new GetBookByIdQuery
+            {
+                Id = id
+            });
+
+        if (result.IsError)
+        {
+            TempData["Error"] = result.FirstError.Description;
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        var book = result.Value;
+
+        var model = new BookDetailsViewModel
+        {
+            Id = book.Id,
+            Title = book.Title,
+            Description = book.Description,
+            ISBN = book.ISBN,
+            Price = book.Price,
+            StockQuantity = book.StockQuantity,
+            CategoryName = book.CategoryName,
+            PublisherName = book.PublisherName,
+            Authors = book.Authors,
+            Tags = book.Tags,
+            CategoryId = book.CategoryId,
+
+            Images = book.Images
+                .Select(image => new BookDetailsImageViewModel
+                {
+                    ImageUrl = image.ImageUrl,
+                    DisplayOrder = image.DisplayOrder
+                })
+                .ToList()
+        };
+
+        return View(model);
+    }
+
+    private async Task LoadBookOptions()
+    {
+        var options = await _mediator.Send(new GetBookFilterOptionsQuery());
+
+        ViewBag.Categories = options.Categories;
+        ViewBag.Publishers = options.Publishers;
+        ViewBag.Authors = options.Authors;
+        ViewBag.Tags = options.Tags;
     }
 }

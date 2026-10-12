@@ -1,0 +1,536 @@
+﻿@model BookShop.Web.Models.Books.CreateBookViewModel
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/book-create.css"
+          asp-append-version="true" />
+}
+@{
+    ViewData["Title"] = "Add book";
+}
+
+<div class="page-header">
+    <h1 class="page-title">Add book</h1>
+
+    <p class="page-description">
+        Add a new book to the catalog.
+    </p>
+</div>
+@if (ViewData.ModelState[string.Empty]?.Errors.Count > 0)
+{
+    <div class="alert alert-danger">
+        @foreach (var error in ViewData.ModelState[string.Empty]!.Errors)
+        {
+            <div>
+                <i class="bi bi-exclamation-circle"></i>
+                @error.ErrorMessage
+            </div>
+        }
+    </div>
+}
+<form asp-controller="AdminBook"
+      asp-action="Create"
+      method="post"
+      enctype="multipart/form-data"
+      class="book-form">
+
+   
+    <div class="card form-card">
+
+        <h2 class="form-section-title">
+            Book information
+        </h2>
+
+        <div class="form-stack">
+
+            <div class="form-group">
+
+                <label asp-for="Title"
+                       class="form-label">
+                    Title
+                </label>
+
+                <input asp-for="Title"
+                       class="form-control"
+                       placeholder="Book title" />
+
+                <span asp-validation-for="Title"
+                      class="field-validation-error">
+                </span>
+
+            </div>
+
+            <div class="form-group">
+
+                <label asp-for="Description"
+                       class="form-label">
+                    Description
+                </label>
+
+                <textarea asp-for="Description"
+                          class="form-control book-description"
+                          placeholder="Book description...">
+                </textarea>
+
+                <span asp-validation-for="Description"
+                      class="field-validation-error">
+                </span>
+
+            </div>
+
+            <div class="book-form__row">
+
+                <div class="form-group">
+
+                    <label asp-for="ISBN"
+                           class="form-label">
+                        ISBN
+                    </label>
+
+                    <input asp-for="ISBN"
+                           class="form-control"
+                           placeholder="ISBN" />
+
+                    <span asp-validation-for="ISBN"
+                          class="field-validation-error">
+                    </span>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label asp-for="Price"
+                           class="form-label">
+                        Price
+                    </label>
+
+                    <input asp-for="Price"
+                           type="number"
+                           step="0.01"
+                           min="0"
+                           class="form-control" />
+
+                    <span asp-validation-for="Price"
+                          class="field-validation-error">
+                    </span>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label asp-for="StockQuantity"
+                           class="form-label">
+                        Stock quantity
+                    </label>
+
+                    <input asp-for="StockQuantity"
+                           type="number"
+                           min="0"
+                           class="form-control" />
+
+                    <span asp-validation-for="StockQuantity"
+                          class="field-validation-error">
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    
+
+    <div class="card form-card">
+
+        <h2 class="form-section-title">
+            Publishing
+        </h2>
+
+        <div class="book-form__row book-form__row--two">
+
+            <div class="form-group">
+
+                <label asp-for="CategoryId"
+                       class="form-label">
+                    Category
+                </label>
+
+                <select asp-for="CategoryId"
+                        class="form-select">
+
+                    <option value="">
+                        Select category
+                    </option>
+
+                    @foreach (var category in ViewBag.Categories)
+                    {
+                        <option value="@category.Id">
+                            @category.Name
+                        </option>
+                    }
+
+                </select>
+
+                <span asp-validation-for="CategoryId"
+                      class="field-validation-error">
+                </span>
+
+            </div>
+
+            <div class="form-group">
+
+                <label asp-for="PublisherId"
+                       class="form-label">
+                    Publisher
+                </label>
+
+                <select asp-for="PublisherId"
+                        class="form-select">
+
+                    <option value="">
+                        Select publisher
+                    </option>
+
+                    @foreach (var publisher in ViewBag.Publishers)
+                    {
+                        <option value="@publisher.Id">
+                            @publisher.Name
+                        </option>
+                    }
+
+                </select>
+
+                <span asp-validation-for="PublisherId"
+                      class="field-validation-error">
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    
+
+    <div class="form-group">
+        <label class="form-label">
+            Authors
+        </label>
+
+        <div class="multi-picker">
+
+            <div class="multi-picker__selected">
+            </div>
+            <div class="multi-picker__field">
+            <div class="multi-picker__control">
+                <i class="bi bi-search multi-picker__search-icon"></i>
+
+                <input type="text"
+                       class="multi-picker__input"
+                       placeholder="Select authors..." />
+
+                <i class="bi bi-chevron-down multi-picker__arrow"></i>
+            </div>
+
+            <div class="multi-picker__dropdown">
+                <div class="multi-picker__options">
+
+                    @foreach (var author in ViewBag.Authors)
+                    {
+                        <label class="multi-picker__option">
+
+                            <input type="checkbox"
+                                   name="AuthorIds"
+                                   value="@author.Id"
+                                   data-label="@author.Name" />
+
+                            <span>@author.Name</span>
+                        </label>
+                    }
+
+                </div>
+            </div>
+            </div>
+
+        </div>
+
+        <span asp-validation-for="AuthorIds"
+              class="field-validation-error">
+        </span>
+    </div>
+
+
+    
+
+    <div class="form-group">
+        <label class="form-label">
+            Tags
+        </label>
+
+        <div class="multi-picker">
+
+            <div class="multi-picker__selected"></div>
+            <div class="multi-picker__field">
+            <div class="multi-picker__control">
+                <i class="bi bi-search multi-picker__search-icon"></i>
+
+                <input type="text"
+                       class="multi-picker__input"
+                       placeholder="Select tags..." />
+
+                <i class="bi bi-chevron-down multi-picker__arrow"></i>
+            </div>
+
+            <div class="multi-picker__dropdown">
+                <div class="multi-picker__options">
+
+                    @foreach (var tag in ViewBag.Tags)
+                    {
+                        <label class="multi-picker__option">
+
+                            <input type="checkbox"
+                                   name="TagIds"
+                                   value="@tag.Id"
+                                   data-label="@tag.Name" />
+
+                            <span>@tag.Name</span>
+                        </label>
+                    }
+
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <span class="form-hint">
+            Tags are optional.
+        </span>
+    </div>
+
+
+    
+
+    <div class="card form-card">
+
+        <div class="form-section-header">
+
+            <div>
+                <h2 class="form-section-title">
+                    Images
+                </h2>
+
+                <p class="form-section-description">
+                    Upload up to five images. The first image will be used as the main image.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="book-image-grid">
+
+            @for (var i = 0; i < 5; i++)
+            {
+                <div class="book-image-upload @(i == 0 ? "book-image-upload--main" : "")">
+
+                    <div class="book-image-upload__header">
+
+                        <span>
+                            Image @(i + 1)
+                        </span>
+
+                        @if (i == 0)
+                        {
+                            <span class="book-image-upload__required">
+                                Main · Required
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="book-image-upload__optional">
+                                Optional
+                            </span>
+                        }
+
+                    </div>
+
+                    <label class="book-image-upload__area">
+
+                        <i class="bi bi-image"></i>
+
+                        <span class="book-image-upload__text">
+                            Choose image
+                        </span>
+
+                        <span class="book-image-upload__filename">
+                            No file selected
+                        </span>
+
+                        <input type="file"
+                               name="Images"
+                               accept="image/jpeg,image/png,image/webp"
+                               class="book-image-upload__input"
+                               required="@(i == 0 ? "required" : null)" />
+
+                    </label>
+
+                </div>
+            }
+
+        </div>
+
+        <span asp-validation-for="Images"
+              class="field-validation-error">
+        </span>
+
+    </div>
+
+
+    
+
+    <div class="book-form-actions">
+
+        <button type="submit"
+                class="btn btn-primary">
+
+            <i class="bi bi-plus-lg"></i>
+            Add book
+        </button>
+
+        <a asp-controller="Book"
+           asp-action="Index"
+           class="btn btn-secondary">
+
+            Cancel
+        </a>
+
+    </div>
+
+</form>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.querySelectorAll('.book-image-upload__input')
+            .forEach(input => {
+
+                input.addEventListener('change', () => {
+
+                    const card = input.closest('.book-image-upload');
+                    const fileName = card.querySelector(
+                        '.book-image-upload__filename');
+
+                    if (input.files.length === 0) {
+                        fileName.textContent = 'No file selected';
+                        return;
+                    }
+
+                    fileName.textContent = input.files[0].name;
+                });
+
+            });
+    </script>
+
+    <script>
+        document.querySelectorAll('.multi-picker')
+            .forEach(picker => {
+
+                const input = picker.querySelector('.multi-picker__input');
+
+                const options = picker.querySelectorAll(
+                    '.multi-picker__option');
+
+                const checkboxes = picker.querySelectorAll(
+                    '.multi-picker__option input[type="checkbox"]');
+
+                const selectedContainer = picker.querySelector(
+                    '.multi-picker__selected');
+
+                input.addEventListener('focus', () => {
+                    picker.classList.add('multi-picker--open');
+                });
+
+                input.addEventListener('input', () => {
+                    picker.classList.add('multi-picker--open');
+
+                    const search = input.value
+                        .trim()
+                        .toLowerCase();
+
+                    options.forEach(option => {
+                        const text = option.textContent
+                            .trim()
+                            .toLowerCase();
+
+                        option.style.display =
+                            text.includes(search)
+                                ? 'flex'
+                                : 'none';
+                    });
+                });
+
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', () => {
+                        renderSelected();
+
+                        input.value = '';
+
+                        options.forEach(option => {
+                            option.style.display = 'flex';
+                        });
+                    });
+                });
+
+                function renderSelected() {
+                    selectedContainer.innerHTML = '';
+
+                    const checked = Array.from(checkboxes)
+                        .filter(x => x.checked);
+
+                    checked.forEach(checkbox => {
+                        const chip = document.createElement('span');
+
+                        chip.className = 'multi-picker__chip';
+
+                        chip.innerHTML = `
+                                <span>${checkbox.dataset.label}</span>
+
+                                <button type="button">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            `;
+
+                        chip.querySelector('button')
+                            .addEventListener('click', () => {
+
+                                checkbox.checked = false;
+
+                                renderSelected();
+                            });
+
+                        selectedContainer.appendChild(chip);
+                    });
+                }
+
+                document.addEventListener('click', event => {
+                    if (!picker.contains(event.target)) {
+                        picker.classList.remove('multi-picker--open');
+
+                        input.value = '';
+
+                        options.forEach(option => {
+                            option.style.display = 'flex';
+                        });
+                    }
+                });
+
+                renderSelected();
+            });
+    </script>
+
+}

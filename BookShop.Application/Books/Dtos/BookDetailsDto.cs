@@ -9,6 +9,7 @@ public class BookDetailsDto
     public decimal Price { get; set; }
     public int StockQuantity { get; set; }
     public string CategoryName { get; set; } = null!;
+    public Guid CategoryId { get; set; }
     public string PublisherName { get; set; } = null!;
     public List<string> Authors { get; set; } = [];
 

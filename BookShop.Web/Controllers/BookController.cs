@@ -2,6 +2,7 @@
 using BookShop.Application.Books.Queries.GetBookById;
 using BookShop.Application.Books.Queries.GetBookFilterOptions;
 using BookShop.Application.Books.Queries.GetBooks;
+using BookShop.Application.Reviews.Queries.GetBookReviews;
 using BookShop.Application.Сommon.Models;
 using BookShop.Web.Models.Books;
 using BookShop.Web.Validators.Images;
@@ -55,42 +56,33 @@ public class BookController : Controller
     [HttpGet]
     public async Task<IActionResult> Details(Guid id)
     {
-        var result = await _mediator.Send(
-            new GetBookByIdQuery
+        var bookResult = await _mediator.Send(new GetBookByIdQuery
             {
                 Id = id
             });
 
-        if (result.IsError)
+        if (bookResult.IsError)
         {
-            TempData["Error"] = result.FirstError.Description;
+            TempData["Error"] = bookResult.FirstError.Description;
 
             return RedirectToAction(nameof(Index));
         }
 
-        var book = result.Value;
+        var reviewsResult = await _mediator.Send(
+            new GetBookReviewsQuery
+            {
+                BookId = id
+            });
+
+        if (reviewsResult.IsError)
+        {
+            return NotFound();
+        }
 
         var model = new BookDetailsViewModel
         {
-            Id = book.Id,
-            Title = book.Title,
-            Description = book.Description,
-            ISBN = book.ISBN,
-            Price = book.Price,
-            StockQuantity = book.StockQuantity,
-            CategoryName = book.CategoryName,
-            PublisherName = book.PublisherName,
-            Authors = book.Authors,
-            Tags = book.Tags,
-            CategoryId = book.CategoryId,
-
-            Images = book.Images
-                .Select(image => new BookDetailsImageViewModel
-                {
-                    ImageUrl = image.ImageUrl,
-                    DisplayOrder = image.DisplayOrder
-                })
-                .ToList()
+            Book = bookResult.Value,
+            Reviews = reviewsResult.Value
         };
 
         return View(model);

@@ -1,0 +1,112 @@
+﻿.user-search {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+    .user-search .form-control {
+        max-width: 420px;
+    }
+
+.user-table-card {
+    overflow: hidden;
+}
+
+.user-table {
+    margin: 0;
+}
+
+    .user-table th {
+        white-space: nowrap;
+    }
+
+    .user-table td {
+        vertical-align: middle;
+    }
+
+.user-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #faf9f6;
+    color: var(--color-text-muted);
+    font-size: 1.25rem;
+}
+
+.user-role-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-role-select {
+    width: 120px;
+}
+
+.user-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.user-status--active {
+    background: #edf7f0;
+    color: #2f6d46;
+}
+
+.user-status--locked {
+    background: #fbecec;
+    color: #a33a3a;
+}
+
+.user-actions-column,
+.user-actions {
+    text-align: right;
+}
+
+.user-empty {
+    padding: 30px;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.btn-danger {
+    border-color: #a33a3a;
+    background: #a33a3a;
+    color: #fff;
+}
+
+    .btn-danger:hover {
+        border-color: #8c3030;
+        background: #8c3030;
+    }
+
+@media (max-width: 800px) {
+    .user-search {
+        flex-wrap: wrap;
+    }
+
+        .user-search .form-control {
+            max-width: none;
+            width: 100%;
+        }
+
+    .user-role-form {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

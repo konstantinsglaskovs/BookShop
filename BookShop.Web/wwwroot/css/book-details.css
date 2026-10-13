@@ -198,3 +198,123 @@
         font-size: 2.2rem;
     }
 }
+
+.book-review-actions {
+    margin-bottom: 16px;
+}
+
+.book-review-form {
+    margin-bottom: 18px;
+    padding: 24px;
+}
+
+.book-review-form__actions {
+    display: flex;
+    gap: 10px;
+}
+
+.review-rating {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    gap: 6px;
+}
+
+    .review-rating input {
+        display: none;
+    }
+
+    .review-rating label {
+        color: var(--color-border);
+        font-size: 1.7rem;
+        cursor: pointer;
+    }
+
+        .review-rating label:hover,
+        .review-rating label:hover ~ label,
+        .review-rating input:checked ~ label {
+            color: var(--color-primary);
+        }
+
+.book-reviews {
+    margin-top: 40px;
+}
+
+.book-reviews__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 18px;
+}
+
+    .book-reviews__header .page-header {
+        margin-bottom: 0;
+    }
+
+.book-review-actions {
+    margin-bottom: 18px;
+}
+
+.book-reviews__list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.book-review {
+    padding: 20px 22px;
+}
+
+.book-review__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.book-review__author {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+    .book-review__author strong {
+        font-size: 1rem;
+    }
+
+.book-review__date {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+}
+
+.book-review__rating {
+    display: flex;
+    gap: 3px;
+    color: var(--color-primary);
+    font-size: 0.95rem;
+}
+
+.book-review__comment {
+    margin: 14px 0 0;
+    color: var(--color-text);
+    line-height: 1.55;
+}
+
+.book-review-form {
+    margin-bottom: 18px;
+    padding: 22px;
+}
+
+    .book-review-form .form-section-title {
+        margin-bottom: 18px;
+    }
+
+.book-review-form__actions {
+    display: flex;
+    gap: 10px;
+}
+
+.book-reviews__empty {
+    padding: 20px;
+    color: var(--color-text-muted);
+}

@@ -11,4 +11,7 @@ public interface IIdentityService
     Task<ErrorOr<Success>> LoginUserAsync(LoginCommand request);
 
     Task<ErrorOr<Success>> LogoutUserAsync();
+
+    Task<ErrorOr<Guid>> GetCurrentUserProfileIdAsync();
+    Task<ErrorOr<string>> GetCurrentUserEmailAsync();
 }

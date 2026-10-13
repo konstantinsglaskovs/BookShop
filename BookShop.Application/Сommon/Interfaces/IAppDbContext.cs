@@ -22,6 +22,8 @@ public interface IAppDbContext
     DbSet<OrderItem> OrderItems { get; }
     DbSet<CartItem> CartItems { get; }
     DbSet<Order> Orders { get; }
+    DbSet<Review> Reviews { get; }
+    DbSet<UserProfile> UserProfiles { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

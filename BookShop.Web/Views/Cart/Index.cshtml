@@ -1,0 +1,212 @@
+﻿@using BookShop.Application.Cart.Dtos
+@model CartDto
+
+@{
+    ViewData["Title"] = "Cart";
+}
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/cart.css"
+          asp-append-version="true" />
+}
+
+<div class="page-header">
+    <h1 class="page-title">Shopping cart</h1>
+
+    <p class="page-description">
+        Review your books before checkout.
+    </p>
+</div>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-circle"></i>
+        @error
+    </div>
+}
+
+@if (Model.Items.Count == 0)
+{
+    <div class="card cart-empty">
+        <i class="bi bi-cart3 cart-empty__icon"></i>
+
+        <h2>Your cart is empty</h2>
+
+        <p>
+            Add some books from the catalog to continue.
+        </p>
+
+        <a asp-controller="Book"
+           asp-action="Index"
+           class="btn btn-primary">
+            Browse books
+        </a>
+    </div>
+}
+else
+{
+    <div class="cart-layout">
+
+        <div class="cart-items">
+
+            @foreach (var item in Model.Items)
+            {
+                <article class="card cart-item">
+
+                    <a asp-controller="Book"
+                       asp-action="Details"
+                       asp-route-id="@item.BookId"
+                       class="cart-item__image-link">
+
+                        @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl"
+                                 alt="@item.Title"
+                                 class="cart-item__image" />
+                        }
+
+                    </a>
+
+                    <div class="cart-item__content">
+
+                        <div class="cart-item__main">
+
+                            <a asp-controller="Book"
+                               asp-action="Details"
+                               asp-route-id="@item.BookId"
+                               class="cart-item__title">
+                                @item.Title
+                            </a>
+
+                            <div class="cart-item__price">
+                                €@item.Price.ToString("0.00") each
+                            </div>
+
+                        </div>
+
+
+                        <div class="cart-item__controls">
+
+                            <div class="quantity-control">
+
+                                <form asp-controller="Cart"
+                                      asp-action="ChangeQuantity"
+                                      method="post">
+
+                                    <input type="hidden"
+                                           name="cartItemId"
+                                           value="@item.Id" />
+
+                                    <input type="hidden"
+                                           name="change"
+                                           value="-1" />
+
+                                    <button type="submit"
+                                            class="quantity-control__button"
+                                            title="Decrease quantity">
+                                        <i class="bi bi-dash-lg"></i>
+                                    </button>
+
+                                </form>
+
+                                <span class="quantity-control__value">
+                                    @item.Quantity
+                                </span>
+
+                                <form asp-controller="Cart"
+                                      asp-action="ChangeQuantity"
+                                      method="post">
+
+                                    <input type="hidden"
+                                           name="cartItemId"
+                                           value="@item.Id" />
+
+                                    <input type="hidden"
+                                           name="change"
+                                           value="1" />
+
+                                    <button type="submit"
+                                            class="quantity-control__button"
+                                            title="Increase quantity"
+                                            disabled="@(item.Quantity >= item.StockQuantity)">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+
+                            <div class="cart-item__subtotal">
+                                €@item.Subtotal.ToString("0.00")
+                            </div>
+
+
+                            <form asp-controller="Cart"
+                                  asp-action="Remove"
+                                  method="post">
+
+                                <input type="hidden"
+                                       name="cartItemId"
+                                       value="@item.Id" />
+
+                                <button type="submit"
+                                        class="cart-item__remove"
+                                        title="Remove from cart">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </article>
+            }
+
+        </div>
+
+
+        <aside class="card cart-summary">
+
+            <h2 class="cart-summary__title">
+                Order summary
+            </h2>
+
+            <div class="cart-summary__row">
+                <span>Items</span>
+
+                <span>
+                    @Model.Items.Sum(item => item.Quantity)
+                </span>
+            </div>
+
+            <div class="cart-summary__divider"></div>
+
+            <div class="cart-summary__row cart-summary__total">
+                <span>Total</span>
+
+                <span>
+                    €@Model.Total.ToString("0.00")
+                </span>
+            </div>
+
+            <a asp-controller="Checkout"
+               asp-action="Index"
+               class="btn btn-primary cart-summary__checkout">
+                Checkout
+            </a>
+
+            <a asp-controller="Book"
+               asp-action="Index"
+               class="cart-summary__continue">
+                Continue shopping
+            </a>
+
+        </aside>
+
+    </div>
+}

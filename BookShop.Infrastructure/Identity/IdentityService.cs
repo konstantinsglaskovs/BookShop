@@ -5,8 +5,9 @@ using BookShop.Application.Сommon.Interfaces;
 using BookShop.Domain.Entities;
 using BookShop.Infrastructure.Persistance;
 using ErrorOr;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookShop.Infrastructure.Identity;
 
@@ -14,14 +15,16 @@ public class IdentityService : IIdentityService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly AppDbContext _db;
 
     public IdentityService(UserManager<ApplicationUser> userManager,
-        SignInManager<ApplicationUser> signInManager,AppDbContext db)
+        SignInManager<ApplicationUser> signInManager, AppDbContext db, IHttpContextAccessor httpContextAccessor)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _db = db;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<ErrorOr<Success>> LoginUserAsync(LoginCommand request)
@@ -96,5 +99,35 @@ public class IdentityService : IIdentityService
         return Result.Success;
     }
 
+    public async Task<ErrorOr<Guid>> GetCurrentUserProfileIdAsync()
+    {
+        var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext!.User);
 
+        if (user is null)
+        {
+            return Error.Unauthorized(code: "User.Unauthorized",description: "User is not authenticated.");
+        }
+
+        var profileId = await _db.UserProfiles.Where(profile => profile.ApplicationUserId == user.Id)
+            .Select(profile => profile.Id).FirstOrDefaultAsync();
+
+        if (profileId == Guid.Empty)
+        {
+            return Error.NotFound(code: "User.ProfileNotFound",description: "User profile was not found.");
+        }
+
+        return profileId;
+    }
+
+    public async Task<ErrorOr<string>> GetCurrentUserEmailAsync()
+    {
+        var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext!.User);
+
+        if (currentUser is null)
+        {
+            return Error.Unauthorized(code: "User.Unauthorized", description: "User is not authenticated.");
+        }
+
+        return currentUser.Email!;
+    }
 }

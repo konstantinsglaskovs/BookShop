@@ -1,0 +1,193 @@
+﻿@using BookShop.Application.Orders.Users.Dtos
+@model UserOrderDetailsDto
+
+@{
+    ViewData["Title"] = "Order details";
+}
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/order.css"
+          asp-append-version="true" />
+}
+
+<div class="page-header">
+    <h1 class="page-title">
+        Order #@Model.Id.ToString()[..8]
+    </h1>
+
+    <p class="page-description">
+        Placed on @(Model.OrderDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm"))
+    </p>
+</div>
+
+<div class="order-details-layout">
+
+    <div class="order-details-main">
+
+        <div class="card order-card">
+            <h2 class="order-card__title">
+                Items
+            </h2>
+
+            <div class="order-items">
+
+                @foreach (var item in Model.Items)
+                {
+                    <div class="order-item">
+
+                        <div class="order-item__info">
+                            <a asp-controller="Book"
+                               asp-action="Details"
+                               asp-route-id="@item.BookId"
+                               class="order-item__title">
+                                @item.Title
+                            </a>
+
+                            <div class="order-item__meta">
+                                @item.Quantity × €@item.UnitPrice.ToString("0.00")
+                            </div>
+                        </div>
+
+                        <div class="order-item__subtotal">
+                            €@item.Subtotal.ToString("0.00")
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        </div>
+
+
+        <div class="card order-card">
+
+            <h2 class="order-card__title">
+                Delivery
+            </h2>
+
+            <div class="order-info-grid">
+
+                <div class="order-info">
+                    <span class="order-info__label">
+                        Recipient
+                    </span>
+
+                    <span class="order-info__value">
+                        @Model.RecipientName @Model.RecipientSurname
+                    </span>
+                </div>
+
+                <div class="order-info">
+                    <span class="order-info__label">
+                        Phone
+                    </span>
+
+                    <span class="order-info__value">
+                        @Model.PhoneNumber
+                    </span>
+                </div>
+
+                <div class="order-info order-info--full">
+                    <span class="order-info__label">
+                        Address
+                    </span>
+
+                    <span class="order-info__value">
+                        @Model.StreetAddress,
+                        @Model.City@if (!string.IsNullOrWhiteSpace(Model.State))
+                        {
+                            <text>, @Model.State</text>
+                        }
+                        ,
+                        @Model.PostalCode,
+                        @Model.Country
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <aside class="card order-summary">
+
+        <h2 class="order-summary__title">
+            Order summary
+        </h2>
+
+        <div class="order-summary__row">
+            <span>Status</span>
+
+            <span class="order-status">
+                @Model.OrderStatus
+            </span>
+        </div>
+
+        <div class="order-summary__row">
+            <span>Payment</span>
+
+            <span>
+                @Model.PaymentStatus
+            </span>
+        </div>
+
+        @if (Model.PaymentDate is not null)
+        {
+            <div class="order-summary__row">
+                <span>Paid</span>
+
+                <span>
+                    @(Model.PaymentDate.Value
+                        .ToLocalTime()
+                        .ToString("dd.MM.yyyy HH:mm"))
+                </span>
+            </div>
+        }
+
+        @if (Model.ShippingDate is not null)
+        {
+            <div class="order-summary__row">
+                <span>Shipped</span>
+
+                <span>
+                    @(Model.ShippingDate.Value
+                        .ToLocalTime()
+                        .ToString("dd.MM.yyyy"))
+                </span>
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Carrier))
+        {
+            <div class="order-summary__row">
+                <span>Carrier</span>
+                <span>@Model.Carrier</span>
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.TrackingNumber))
+        {
+            <div class="order-summary__row">
+                <span>Tracking</span>
+                <span>@Model.TrackingNumber</span>
+            </div>
+        }
+
+        <div class="order-summary__divider"></div>
+
+        <div class="order-summary__total">
+            <span>Total</span>
+            <span>€@Model.Total.ToString("0.00")</span>
+        </div>
+
+        <a asp-action="Index"
+           class="order-summary__back">
+            Back to orders
+        </a>
+
+    </aside>
+
+</div>

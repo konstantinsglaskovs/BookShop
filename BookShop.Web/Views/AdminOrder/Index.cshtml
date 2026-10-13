@@ -1,0 +1,205 @@
+﻿@using BookShop.Domain.Enums
+@using BookShop.Web.Models.Orders
+@model AdminOrdersViewModel
+
+@{
+    ViewData["Title"] = "Orders";
+}
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/admin-order.css"
+          asp-append-version="true" />
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Orders</h1>
+        <p class="page-description">
+            Manage customer orders.
+        </p>
+    </div>
+</div>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">
+        @error
+    </div>
+}
+
+<form asp-action="Index"
+      method="get"
+      class="admin-order-toolbar">
+
+    <input type="text"
+           name="search"
+           value="@ViewBag.Search"
+           class="form-control"
+           placeholder="Search orders..." />
+
+    <select name="orderStatus"
+            class="form-select">
+
+        <option value="">All order statuses</option>
+
+        @foreach (var status in Enum.GetValues<OrderStatus>())
+        {
+            if (ViewBag.OrderStatus?.ToString() == status.ToString())
+            {
+                <option value="@status" selected>
+                    @status
+                </option>
+            }
+            else
+            {
+                <option value="@status">
+                    @status
+                </option>
+            }
+        }
+
+    </select>
+
+    <select name="paymentStatus"
+            class="form-select">
+
+        <option value="">All payment statuses</option>
+
+        @foreach (var status in Enum.GetValues<PaymentStatus>())
+        {
+            if (ViewBag.PaymentStatus?.ToString() == status.ToString())
+            {
+                <option value="@status" selected>
+                    @status
+                </option>
+            }
+            else
+            {
+                <option value="@status">
+                    @status
+                </option>
+            }
+        }
+
+    </select>
+
+    <button type="submit"
+            class="btn btn-primary">
+        Search
+    </button>
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        Reset
+    </a>
+
+</form>
+
+@if (Model.Orders.Count == 0)
+{
+    <div class="card admin-order-empty">
+        <h2>No orders found</h2>
+        <p>There are no orders matching the current filters.</p>
+    </div>
+}
+else
+{
+    <div class="card admin-order-table-card">
+
+        <table class="admin-order-table">
+
+            <thead>
+            <tr>
+                <th>Order</th>
+                <th>Recipient</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Payment</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            @foreach (var order in Model.Orders)
+            {
+                <tr>
+
+                    <td>
+                        #@order.Id.ToString()[..8]
+                    </td>
+
+                    <td>
+                        @order.RecipientName @order.RecipientSurname
+                    </td>
+
+                    <td>
+                        @(order.OrderDate
+                            .ToLocalTime()
+                            .ToString("dd.MM.yyyy HH:mm"))
+                    </td>
+
+                    <td>
+                        @order.ItemsCount
+                    </td>
+
+                    <td>
+                        €@order.Total.ToString("0.00")
+                    </td>
+
+                    <td>
+                        <span class="order-badge
+                            order-badge--@order.OrderStatus.ToString().ToLowerInvariant()">
+                            @order.OrderStatus
+                        </span>
+                    </td>
+
+                    <td>
+                        <span class="payment-badge
+                            payment-badge--@order.PaymentStatus.ToString().ToLowerInvariant()">
+                            @order.PaymentStatus
+                        </span>
+                    </td>
+
+                    <td>
+                        <a asp-action="Edit"
+                           asp-route-id="@order.Id"
+                           class="btn btn-secondary btn-sm">
+                            Edit
+                        </a>
+                    </td>
+
+                </tr>
+            }
+
+            </tbody>
+
+        </table>
+
+    </div>
+}
+
+@if (Model.TotalPages > 1)
+{
+    <div class="pagination">
+
+        @for (var currentPage = 1;
+              currentPage <= Model.TotalPages;
+              currentPage++)
+        {
+            <a asp-action="Index"
+               asp-route-search="@ViewBag.Search"
+               asp-route-orderStatus="@ViewBag.OrderStatus"
+               asp-route-paymentStatus="@ViewBag.PaymentStatus"
+               asp-route-page="@currentPage"
+               class="pagination__item @(currentPage == Model.Page ? "is-active" : "")">
+
+                @currentPage
+            </a>
+        }
+
+    </div>
+}

@@ -311,11 +311,24 @@ else
                             €@book.Price.ToString("0.00")
                         </div>
 
-                        <button type="button"
-                                class="btn btn-primary btn-icon"
-                                title="Add to cart">
-                            <i class="bi bi-cart3"></i>
-                        </button>
+                        <form asp-controller="Cart"
+                              asp-action="Add"
+                              method="post">
+
+                            <input type="hidden"
+                                   name="bookId"
+                                   value="@book.Id" />
+
+                            <input type="hidden"
+                                   name="returnUrl"
+                                   value="@Context.Request.Path@Context.Request.QueryString" />
+
+                            <button type="submit"
+                                    class="btn btn-primary btn-icon">
+                                <i class="bi bi-cart3"></i>
+                            </button>
+
+                        </form>
 
                     </div>
 

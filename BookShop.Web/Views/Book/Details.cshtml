@@ -1,9 +1,9 @@
 ﻿@model BookShop.Web.Models.Books.BookDetailsViewModel
 
 @{
-    ViewData["Title"] = Model.Title;
+    ViewData["Title"] = Model.Book.Title;
 
-    var mainImage = Model.Images
+    var mainImage = Model.Book.Images
         .OrderBy(x => x.DisplayOrder)
         .FirstOrDefault();
 }
@@ -24,16 +24,31 @@
 
     <a asp-controller="Book"
        asp-action="Index"
-       asp-route-categoryIds="@Model.CategoryId">
-        @Model.CategoryName
+       asp-route-categoryIds="@Model.Book.CategoryId">
+        @Model.Book.CategoryName
     </a>
 
     <i class="bi bi-chevron-right"></i>
 
     <span>
-        @Model.Title
+        @Model.Book.Title
     </span>
 </nav>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">
+        @error
+    </div>
+}
+
+@if (TempData["Success"] is string success)
+{
+    <div class="alert alert-success">
+        @success
+    </div>
+}
+
 <div class="book-details">
 
     <div class="book-details__gallery">
@@ -43,21 +58,21 @@
             <div class="book-details__main-image">
                 <img id="mainBookImage"
                      src="@mainImage.ImageUrl"
-                     alt="@Model.Title" />
+                     alt="@Model.Book.Title" />
             </div>
 
-            @if (Model.Images.Count > 1)
+            @if (Model.Book.Images.Count > 1)
             {
                 <div class="book-details__thumbnails">
 
-                    @foreach (var image in Model.Images.OrderBy(x => x.DisplayOrder))
+                    @foreach (var image in Model.Book.Images.OrderBy(x => x.DisplayOrder))
                     {
                         <button type="button"
                                 class="book-details__thumbnail"
                                 data-image-url="@image.ImageUrl">
 
                             <img src="@image.ImageUrl"
-                                 alt="@Model.Title" />
+                                 alt="@Model.Book.Title" />
 
                         </button>
                     }
@@ -68,23 +83,24 @@
 
     </div>
 
+
     <div class="book-details__content">
 
         <h1 class="book-details__title">
-            @Model.Title
+            @Model.Book.Title
         </h1>
 
         <div class="book-details__authors">
-            by @string.Join(", ", Model.Authors)
+            by @string.Join(", ", Model.Book.Authors)
         </div>
 
-        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        @if (!string.IsNullOrWhiteSpace(Model.Book.Description))
         {
             <div class="book-details__description-wrapper">
 
                 <div id="bookDescription"
                      class="book-details__description">
-                    @Model.Description
+                    @Model.Book.Description
                 </div>
 
                 <button type="button"
@@ -98,10 +114,10 @@
         }
 
         <div class="book-details__price">
-            €@Model.Price.ToString("0.00")
+            €@Model.Book.Price.ToString("0.00")
         </div>
 
-        @if (Model.StockQuantity > 0)
+        @if (Model.Book.StockQuantity > 0)
         {
             <div class="book-details__stock book-details__stock--available">
                 <i class="bi bi-circle-fill"></i>
@@ -116,43 +132,60 @@
             </div>
         }
 
-        @if (Model.StockQuantity > 0)
+        @if (Model.Book.StockQuantity > 0)
         {
-            <button type="button"
-                    class="btn btn-primary book-details__cart-button">
+            <form asp-controller="Cart"
+                  asp-action="Add"
+                  method="post">
 
-                <i class="bi bi-cart3"></i>
-                Add to cart
-            </button>
+                <input type="hidden"
+                       name="bookId"
+                       value="@Model.Book.Id" />
+
+                <input type="hidden"
+                       name="quantity"
+                       value="1" />
+
+                <input type="hidden"
+                       name="returnUrl"
+                       value="@Context.Request.Path@Context.Request.QueryString" />
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    <i class="bi bi-cart-plus"></i>
+                    Add to cart
+                </button>
+
+            </form>
         }
 
         <div class="book-details__meta">
 
             <div class="book-details__meta-row">
                 <span>Category</span>
-                <strong>@Model.CategoryName</strong>
+                <strong>@Model.Book.CategoryName</strong>
             </div>
 
             <div class="book-details__meta-row">
                 <span>Publisher</span>
-                <strong>@Model.PublisherName</strong>
+                <strong>@Model.Book.PublisherName</strong>
             </div>
 
-            @if (!string.IsNullOrWhiteSpace(Model.ISBN))
+            @if (!string.IsNullOrWhiteSpace(Model.Book.ISBN))
             {
                 <div class="book-details__meta-row">
                     <span>ISBN</span>
-                    <strong>@Model.ISBN</strong>
+                    <strong>@Model.Book.ISBN</strong>
                 </div>
             }
 
         </div>
 
-        @if (Model.Tags.Count > 0)
+        @if (Model.Book.Tags.Count > 0)
         {
             <div class="book-details__tags">
 
-                @foreach (var tag in Model.Tags)
+                @foreach (var tag in Model.Book.Tags)
                 {
                     <span class="book-details__tag">
                         @tag
@@ -165,6 +198,187 @@
     </div>
 
 </div>
+
+
+<section class="book-reviews">
+
+    <div class="book-reviews__header">
+
+        <div>
+            <h2 class="page-title">
+                Reviews
+            </h2>
+
+            <p class="page-description">
+                @Model.Reviews.Count review@(Model.Reviews.Count == 1 ? "" : "s")
+            </p>
+        </div>
+
+    </div>
+
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <div class="book-review-actions">
+            <button type="button"
+                    id="reviewToggle"
+                    class="btn btn-primary">
+                <i class="bi bi-pencil-square"></i>
+                Write a review
+            </button>
+        </div>
+
+        <div id="reviewForm"
+             class="card book-review-form"
+             hidden>
+
+            <h2 class="form-section-title">
+                Write a review
+            </h2>
+
+            <form asp-controller="Review"
+                  asp-action="Create"
+                  method="post"
+                  class="form-stack">
+
+                <input type="hidden"
+                       name="bookId"
+                       value="@Model.Book.Id" />
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        Rating
+                    </label>
+
+                    <div class="review-rating">
+
+                        @for (var rating = 5; rating >= 1; rating--)
+                        {
+                            <input type="radio"
+                                   id="rating-@rating"
+                                   name="rating"
+                                   value="@rating"
+                                   required />
+
+                            <label for="rating-@rating"
+                                   title="@rating stars">
+                                <i class="bi bi-star-fill"></i>
+                            </label>
+                        }
+
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label class="form-label"
+                           for="reviewComment">
+                        Comment
+                    </label>
+
+                    <textarea id="reviewComment"
+                              name="comment"
+                              class="form-control"
+                              rows="4"
+                              maxlength="2000"
+                              placeholder="Share your thoughts about this book..."></textarea>
+
+                </div>
+
+                <div class="book-review-form__actions">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Submit review
+                    </button>
+
+                    <button type="button"
+                            id="reviewCancel"
+                            class="btn btn-secondary">
+                        Cancel
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <p>
+                <a asp-controller="Account"
+                   asp-action="Login">
+                    Sign in
+                </a>
+                to leave a review.
+            </p>
+        </div>
+    }
+
+
+    @if (Model.Reviews.Count == 0)
+    {
+        <div class="card book-reviews__empty">
+            No reviews yet.
+        </div>
+    }
+    else
+    {
+        <div class="book-reviews__list">
+
+            @foreach (var review in Model.Reviews)
+            {
+                <article class="card book-review">
+
+                    <div class="book-review__header">
+
+                        <div class="book-review__author">
+                            <strong>
+                                @review.AuthorName
+                            </strong>
+
+                            <span class="book-review__date">
+                                @(review.CreatedAt
+                                    .ToLocalTime()
+                                    .ToString("dd.MM.yyyy"))
+                            </span>
+                        </div>
+
+                        <div class="book-review__rating">
+                            @for (var star = 1; star <= 5; star++)
+                            {
+                                if (star <= review.Rating)
+                                {
+                                    <i class="bi bi-star-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-star"></i>
+                                }
+                            }
+                        </div>
+
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(review.Comment))
+                    {
+                        <p class="book-review__comment">
+                            @review.Comment
+                        </p>
+                    }
+
+                </article>
+            }
+
+        </div>
+    }
+
+</section>
+
 
 @section Scripts {
     <script>
@@ -212,6 +426,30 @@
                     expanded
                         ? 'Show less'
                         : 'Show more';
+            });
+        }
+    </script>
+    <script>
+        const reviewToggle =
+            document.getElementById('reviewToggle');
+
+        const reviewForm =
+            document.getElementById('reviewForm');
+
+        const reviewCancel =
+            document.getElementById('reviewCancel');
+
+        if (reviewToggle && reviewForm) {
+            reviewToggle.addEventListener('click', () => {
+                reviewForm.hidden = false;
+                reviewToggle.hidden = true;
+            });
+        }
+
+        if (reviewCancel && reviewForm && reviewToggle) {
+            reviewCancel.addEventListener('click', () => {
+                reviewForm.hidden = true;
+                reviewToggle.hidden = false;
             });
         }
     </script>

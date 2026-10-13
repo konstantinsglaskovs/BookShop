@@ -72,18 +72,7 @@
                     </a>
                 }
 
-                <a href="#"
-                   class="site-nav__link site-cart">
-
-                    <i class="bi bi-cart3"></i>
-
-                    <span>Cart</span>
-
-                    <span class="site-cart__count">
-                        0
-                    </span>
-
-                </a>
+                @await Component.InvokeAsync("CartIcon")
 
             </nav>
 

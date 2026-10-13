@@ -1,0 +1,301 @@
+﻿@using BookShop.Application.Orders.Admins.Dtos
+@using BookShop.Domain.Enums
+@using BookShop.Web.Models.Orders
+@model UpdateOrderViewModel
+
+@{
+    ViewData["Title"] = "Edit order";
+
+    var order = ViewBag.Order as AdminOrderDetailsDto;
+}
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/admin-order.css"
+          asp-append-version="true" />
+}
+
+@if (order is null)
+{
+    <div class="alert alert-danger">
+        Order data could not be loaded.
+    </div>
+
+    return;
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">
+            Order #@order.Id.ToString()[..8]
+        </h1>
+
+        <p class="page-description">
+            Placed on @(order.OrderDate
+                            .ToLocalTime()
+                            .ToString("dd.MM.yyyy HH:mm"))
+        </p>
+    </div>
+</div>
+
+<div asp-validation-summary="ModelOnly"
+     class="validation-summary-errors">
+</div>
+
+<div class="admin-order-edit-layout">
+
+    <div class="admin-order-edit-main">
+
+        <div class="card admin-order-section">
+
+            <h2 class="admin-order-section__title">
+                Items
+            </h2>
+
+            <div class="admin-order-items">
+
+                @foreach (var item in order.Items)
+                {
+                    <div class="admin-order-item">
+
+                        <div>
+                            <a asp-controller="Book"
+                               asp-action="Details"
+                               asp-route-id="@item.BookId"
+                               class="admin-order-item__title">
+                                @item.Title
+                            </a>
+
+                            <div class="admin-order-item__meta">
+                                @item.Quantity × €@item.UnitPrice.ToString("0.00")
+                            </div>
+                        </div>
+
+                        <div class="admin-order-item__subtotal">
+                            €@item.Subtotal.ToString("0.00")
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+
+        <div class="card admin-order-section">
+
+            <h2 class="admin-order-section__title">
+                Customer
+            </h2>
+
+            <div class="admin-order-info-grid">
+
+                <div class="admin-order-info">
+                    <span class="admin-order-info__label">
+                        Recipient
+                    </span>
+
+                    <span>
+                        @order.RecipientName @order.RecipientSurname
+                    </span>
+                </div>
+
+                <div class="admin-order-info">
+                    <span class="admin-order-info__label">
+                        Phone
+                    </span>
+
+                    <span>
+                        @order.PhoneNumber
+                    </span>
+                </div>
+
+                <div class="admin-order-info admin-order-info--full">
+
+                    <span class="admin-order-info__label">
+                        Address
+                    </span>
+
+                    <span>
+                        @order.StreetAddress,
+                        @order.City
+
+                        @if (!string.IsNullOrWhiteSpace(order.State))
+                        {
+                            <text>, @order.State</text>
+                        }
+
+                        , @order.PostalCode,
+                        @order.Country
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card admin-order-section">
+
+            <h2 class="admin-order-section__title">
+                Payment
+            </h2>
+
+            <div class="admin-order-info-grid">
+
+                <div class="admin-order-info">
+
+                    <span class="admin-order-info__label">
+                        Payment status
+                    </span>
+
+                    <span class="payment-badge payment-badge--@order.PaymentStatus.ToString().ToLowerInvariant()">
+                        @order.PaymentStatus
+                    </span>
+
+                </div>
+
+                <div class="admin-order-info">
+
+                    <span class="admin-order-info__label">
+                        Total
+                    </span>
+
+                    <strong>
+                        €@order.Total.ToString("0.00")
+                    </strong>
+
+                </div>
+
+                @if (order.PaymentDate is not null)
+                {
+                    <div class="admin-order-info">
+
+                        <span class="admin-order-info__label">
+                            Payment date
+                        </span>
+
+                        <span>
+                            @(order.PaymentDate.Value
+                                .ToLocalTime()
+                                .ToString("dd.MM.yyyy HH:mm"))
+                        </span>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <aside class="card admin-order-update">
+
+        <h2 class="admin-order-update__title">
+            Manage order
+        </h2>
+
+        <form asp-action="Edit"
+              method="post">
+
+            <input asp-for="Id"
+                   type="hidden" />
+
+            <div class="form-stack">
+
+                <div class="form-group">
+
+                    <label asp-for="OrderStatus"
+                           class="form-label">
+                        Order status
+                    </label>
+
+                    <select asp-for="OrderStatus"
+                            asp-items="Html.GetEnumSelectList<OrderStatus>()"
+                            class="form-select">
+                    </select>
+
+                    <span asp-validation-for="OrderStatus"
+                          class="field-validation-error">
+                    </span>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label asp-for="Carrier"
+                           class="form-label">
+                        Carrier
+                    </label>
+
+                    <input asp-for="Carrier"
+                           class="form-control" />
+
+                    <span asp-validation-for="Carrier"
+                          class="field-validation-error">
+                    </span>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label asp-for="TrackingNumber"
+                           class="form-label">
+                        Tracking number
+                    </label>
+
+                    <input asp-for="TrackingNumber"
+                           class="form-control" />
+
+                    <span asp-validation-for="TrackingNumber"
+                          class="field-validation-error">
+                    </span>
+
+                </div>
+
+
+                @if (order.ShippingDate is not null)
+                {
+                    <div class="admin-order-shipping-date">
+
+                        <span>
+                            Shipping date
+                        </span>
+
+                        <strong>
+                            @(order.ShippingDate.Value
+                                .ToLocalTime()
+                                .ToString("dd.MM.yyyy HH:mm"))
+                        </strong>
+
+                    </div>
+                }
+
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    Save changes
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary">
+                    Back to orders
+                </a>
+
+            </div>
+
+        </form>
+
+    </aside>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

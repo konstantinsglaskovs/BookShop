@@ -1,0 +1,291 @@
+﻿@using BookShop.Application.Profiles.Dtos
+@model ProfileDto
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/profile.css"
+          asp-append-version="true" />
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Profile</h1>
+
+        <p class="page-description">
+            Manage your personal information and profile image.
+        </p>
+    </div>
+</div>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">
+        @error
+    </div>
+}
+
+@if (TempData["Success"] is string success)
+{
+    <div class="alert alert-success">
+        @success
+    </div>
+}
+
+<div id="profileMessage"
+     class="alert"
+     hidden>
+</div>
+
+<div class="profile-layout">
+
+    <aside class="card profile-image-card">
+
+        @{
+            var hasProfileImage =
+                !string.IsNullOrWhiteSpace(Model.ProfileImageUrl);
+        }
+
+        <div class="profile-image-wrapper">
+
+            <img id="profileImage"
+                 src="@(hasProfileImage ? Model.ProfileImageUrl : "")"
+                 alt="@Model.Name @Model.Surname"
+                 class="profile-image @(hasProfileImage ? "" : "is-hidden")" />
+
+            <div id="profileImagePlaceholder"
+                 class="profile-image-placeholder @(hasProfileImage ? "is-hidden" : "")">
+                <i class="bi bi-person-fill"></i>
+            </div>
+
+        </div>
+
+        <div class="profile-image-actions">
+
+            <label for="profileImageInput"
+                   class="btn btn-primary">
+                <i class="bi bi-camera"></i>
+                Change image
+            </label>
+
+            <input type="file"
+                   id="profileImageInput"
+                   accept="image/jpeg,image/png,image/webp"
+                   hidden />
+
+            <button type="button"
+                    id="removeProfileImage"
+                    class="btn btn-secondary"
+                    disabled="@(!hasProfileImage)">
+                <i class="bi bi-trash"></i>
+                Remove
+            </button>
+
+        </div>
+
+        <p class="profile-image-hint">
+            JPEG, PNG or WebP. Maximum size 10 MB.
+        </p>
+
+    </aside>
+
+
+    <div class="card profile-info-card">
+
+        <h2 class="profile-section-title">
+            Personal information
+        </h2>
+
+        <form asp-controller="Profile"
+              asp-action="Update"
+              method="post"
+              class="form-stack">
+
+            <div class="profile-name-row">
+
+                <div class="form-group">
+
+                    <label for="Name"
+                           class="form-label">
+                        Name
+                    </label>
+
+                    <input id="Name"
+                           name="name"
+                           value="@Model.Name"
+                           class="form-control"
+                           maxlength="100"
+                           required />
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="Surname"
+                           class="form-label">
+                        Surname
+                    </label>
+
+                    <input id="Surname"
+                           name="surname"
+                           value="@Model.Surname"
+                           class="form-control"
+                           maxlength="100"
+                           required />
+
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label class="form-label">
+                    Email
+                </label>
+
+                <input value="@Model.Email"
+                       class="form-control"
+                       readonly />
+
+            </div>
+
+            <div class="profile-form-actions">
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    Save changes
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+@Html.AntiForgeryToken()
+
+@section Scripts {
+    <script>
+        const imageInput =
+            document.getElementById('profileImageInput');
+
+        const profileImage =
+            document.getElementById('profileImage');
+
+        const placeholder =
+            document.getElementById('profileImagePlaceholder');
+
+        const removeButton =
+            document.getElementById('removeProfileImage');
+
+        const message =
+            document.getElementById('profileMessage');
+
+        const token =
+            document.querySelector(
+                'input[name="__RequestVerificationToken"]');
+
+        function showMessage(text, isError) {
+            message.textContent = text;
+
+            message.className =
+                isError
+                    ? 'alert alert-danger'
+                    : 'alert alert-success';
+
+            message.hidden = false;
+        }
+
+
+        imageInput.addEventListener('change', async () => {
+
+            const file = imageInput.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            const formData = new FormData();
+
+            formData.append('image', file);
+
+            const response = await fetch(
+                '@Url.Action("UpdateImage", "Profile")',
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'RequestVerificationToken':
+                            token.value
+                    },
+
+                    body: formData
+                });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                showMessage(
+                    data.error ?? 'Failed to update profile image.',
+                    true);
+
+                imageInput.value = '';
+
+                return;
+            }
+
+            profileImage.src = data.imageUrl;
+
+            profileImage.classList.remove('is-hidden');
+            placeholder.classList.add('is-hidden');
+
+            removeButton.disabled = false;
+
+            imageInput.value = '';
+
+            showMessage(
+                'Profile image updated successfully.',
+                false);
+        });
+
+
+        removeButton.addEventListener('click', async () => {
+
+            const response = await fetch(
+                '@Url.Action("RemoveImage", "Profile")',
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'RequestVerificationToken':
+                            token.value
+                    }
+                });
+
+            if (!response.ok) {
+                const data = await response.json();
+
+                showMessage(
+                    data.error ?? 'Failed to remove profile image.',
+                    true);
+
+                return;
+            }
+
+            profileImage.src = '';
+            profileImage.classList.add('is-hidden');
+            placeholder.classList.remove('is-hidden');
+
+            removeButton.disabled = true;
+
+            showMessage(
+                'Profile image removed successfully.',
+                false);
+        });
+    </script>
+}

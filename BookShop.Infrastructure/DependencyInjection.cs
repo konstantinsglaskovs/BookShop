@@ -1,14 +1,18 @@
 ﻿using Amazon.Runtime;
 using Amazon.S3;
 using BookShop.Application.Сommon.Interfaces;
+using BookShop.Infrastructure.BackgroundServices;
 using BookShop.Infrastructure.Identity;
+using BookShop.Infrastructure.Payment;
 using BookShop.Infrastructure.Persistance;
+using BookShop.Infrastructure.Services;
 using BookShop.Infrastructure.Storage;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Stripe;
 
 namespace BookShop.Infrastructure;
 
@@ -59,8 +63,20 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IFileStorage, S3FileStorage>();
-        services.AddScoped<IIdentityService, IdentityService>();
+        services.AddScoped<IIdentityService, Identity.IdentityService>();
         services.AddScoped<RoleSeeder>();
+        services.AddScoped<AdminSeeder>();
+        services.AddScoped<IUserManagementService, UserManagementService>();
+
+        services.Configure<StripeSettings>(configuration.GetSection("Stripe"));
+        services.AddSingleton(sp =>
+        {
+            var settings = sp.GetRequiredService<IOptions<StripeSettings>>().Value;
+
+            return new StripeClient(settings.SecretKey);
+        });
+        services.AddScoped<IPaymentService, StripePaymentService>();
+        services.AddHostedService<PendingOrderCleanupService>();
 
         return services;
     }

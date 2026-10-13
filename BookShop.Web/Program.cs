@@ -22,12 +22,16 @@ builder.Services.AddSingleton<IFileFormatInspector>(fileFormatInspector);
 
 var app = builder.Build();
 
-using var scope = app.Services.CreateScope();
+using (var scope = app.Services.CreateScope())
+{
+    var roleSeeder =scope.ServiceProvider.GetRequiredService<RoleSeeder>();
 
-var roleSeeder =
-    scope.ServiceProvider.GetRequiredService<RoleSeeder>();
+    await roleSeeder.SeedAsync();
 
-await roleSeeder.SeedAsync();
+    var adminSeeder =scope.ServiceProvider.GetRequiredService<AdminSeeder>();
+
+    await adminSeeder.SeedAsync();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

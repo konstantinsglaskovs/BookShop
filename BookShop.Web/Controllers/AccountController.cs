@@ -4,6 +4,7 @@ using BookShop.Application.Auth.Commands.Register;
 using BookShop.Web.Models.Account;
 using Mapster;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookShop.Web.Controllers;
@@ -78,15 +79,22 @@ public class AccountController : Controller
             return View(model);
         }
 
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("Index", "Book");
     }
 
+    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
         await _mediator.Send(new LogoutCommand());
 
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("Index", "Book");
+    }
+
+    [HttpGet]
+    public IActionResult AccessDenied()
+    {
+        return View();
     }
 }

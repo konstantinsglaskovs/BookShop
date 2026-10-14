@@ -1,39 +1,154 @@
 ﻿@model BookShop.Web.Models.Account.LoginViewModel
 
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Sign in";
 }
 
-<h2>Login</h2>
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/authorization.css"
+          asp-append-version="true" />
+}
 
-<form asp-action="Login" method="post">
-    <div asp-validation-summary="ModelOnly"></div>
+<div class="login-page">
 
-    <div>
-        <label asp-for="Email"></label>
-        <input asp-for="Email" />
-        <span asp-validation-for="Email"></span>
+    <div class="login-card">
+
+        <div class="login-header">
+            <h1>Sign in</h1>
+            <p>Access your account dashboard</p>
+        </div>
+
+        <form asp-action="Login"
+              method="post"
+              class="login-form">
+
+            <div asp-validation-summary="ModelOnly"
+                 class="validation-summary-errors">
+            </div>
+
+            <div class="login-field">
+
+                <label asp-for="Email"
+                       class="form-label">
+                </label>
+
+                <div class="login-input-wrapper">
+                    <i class="bi bi-envelope login-input-icon"></i>
+
+                    <input asp-for="Email"
+                           class="form-control login-input"
+                           placeholder="Email address"
+                           autocomplete="email" />
+                </div>
+
+                <span asp-validation-for="Email"
+                      class="field-validation-error">
+                </span>
+
+            </div>
+
+            <div class="login-field">
+
+                <label asp-for="Password"
+                       class="form-label">
+                </label>
+
+                <div class="login-input-wrapper">
+                    <i class="bi bi-lock login-input-icon"></i>
+
+                    <input asp-for="Password"
+                           id="passwordInput"
+                           class="form-control login-input login-password-input"
+                           placeholder="Password"
+                           autocomplete="current-password" />
+
+                    <button type="button"
+                            id="togglePassword"
+                            class="password-toggle"
+                            aria-label="Show password">
+
+                        <i id="passwordIcon"
+                           class="bi bi-eye">
+                        </i>
+
+                    </button>
+                </div>
+
+                <span asp-validation-for="Password"
+                      class="field-validation-error">
+                </span>
+
+            </div>
+
+            <div class="remember-row">
+
+                <label class="remember-label">
+
+                    <input asp-for="RememberMe"
+                           class="remember-checkbox" />
+
+                    <span>
+                        Remember me
+                    </span>
+
+                </label>
+
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary login-submit">
+
+                <span>Sign in</span>
+
+                <i class="bi bi-arrow-right"></i>
+
+            </button>
+
+        </form>
+
+        <div class="login-divider"></div>
+
+        <div class="login-register">
+            <span>No account?</span>
+
+            <a asp-action="Register">
+                Register
+            </a>
+        </div>
+
     </div>
 
-    <div>
-        <label asp-for="Password"></label>
-        <input asp-for="Password" />
-        <span asp-validation-for="Password"></span>
-    </div>
-
-    <div>
-        <input asp-for="RememberMe" />
-        <label asp-for="RememberMe"></label>
-    </div>
-
-    <button type="submit">Login</button>
-</form>
-
-<p>
-    Don't have an account?
-    <a asp-action="Register">Register</a>
-</p>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const passwordInput =
+            document.getElementById('passwordInput');
+
+        const togglePassword =
+            document.getElementById('togglePassword');
+
+        const passwordIcon =
+            document.getElementById('passwordIcon');
+
+        togglePassword.addEventListener('click', () => {
+
+            const isPassword =
+                passwordInput.type === 'password';
+
+            passwordInput.type =
+                isPassword ? 'text' : 'password';
+
+            passwordIcon.classList.toggle(
+                'bi-eye',
+                !isPassword);
+
+            passwordIcon.classList.toggle(
+                'bi-eye-slash',
+                isPassword);
+        });
+    </script>
 }

@@ -4,10 +4,12 @@ using BookShop.Application.Publishers.Commands.UpdatePublisher;
 using BookShop.Application.Publishers.Queries.GetPublishers;
 using BookShop.Web.Models.Publishers;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookShop.Web.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class PublisherController : Controller
     {
         private readonly IMediator _mediator;

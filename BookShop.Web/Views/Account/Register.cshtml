@@ -4,49 +4,250 @@
     ViewData["Title"] = "Register";
 }
 
-<h2>Register</h2>
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/authorization.css"
+          asp-append-version="true" />
+}
 
-<form asp-action="Register" method="post">
-    <div asp-validation-summary="ModelOnly"></div>
+<div class="register-page">
 
-    <div>
-        <label asp-for="Email"></label>
-        <input asp-for="Email" />
-        <span asp-validation-for="Email"></span>
+    <div class="register-card">
+
+        <div class="register-header">
+            <h1>Create account</h1>
+
+            <p>
+                Join BookShop and start discovering your next read.
+            </p>
+        </div>
+
+        <form asp-action="Register"
+              method="post"
+              class="register-form">
+
+            <div asp-validation-summary="ModelOnly"
+                 class="validation-summary-errors">
+            </div>
+
+            <div class="register-field">
+
+                <label asp-for="Email"
+                       class="form-label">
+                </label>
+
+                <div class="register-input-wrapper">
+
+                    <i class="bi bi-envelope register-input-icon"></i>
+
+                    <input asp-for="Email"
+                           class="form-control register-input"
+                           placeholder="Email address"
+                           autocomplete="email" />
+
+                </div>
+
+                <span asp-validation-for="Email"
+                      class="field-validation-error">
+                </span>
+
+            </div>
+
+            <div class="register-name-row">
+
+                <div class="register-field">
+
+                    <label asp-for="Name"
+                           class="form-label">
+                    </label>
+
+                    <div class="register-input-wrapper">
+
+                        <i class="bi bi-person register-input-icon"></i>
+
+                        <input asp-for="Name"
+                               class="form-control register-input"
+                               placeholder="First name"
+                               autocomplete="given-name" />
+
+                    </div>
+
+                    <span asp-validation-for="Name"
+                          class="field-validation-error">
+                    </span>
+
+                </div>
+
+                <div class="register-field">
+
+                    <label asp-for="Surname"
+                           class="form-label">
+                    </label>
+
+                    <div class="register-input-wrapper">
+
+                        <i class="bi bi-person register-input-icon"></i>
+
+                        <input asp-for="Surname"
+                               class="form-control register-input"
+                               placeholder="Last name"
+                               autocomplete="family-name" />
+
+                    </div>
+
+                    <span asp-validation-for="Surname"
+                          class="field-validation-error">
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="register-field">
+
+                <label asp-for="Password"
+                       class="form-label">
+                </label>
+
+                <div class="register-input-wrapper">
+
+                    <i class="bi bi-lock register-input-icon"></i>
+
+                    <input asp-for="Password"
+                           id="passwordInput"
+                           class="form-control register-input register-password-input"
+                           placeholder="Password"
+                           autocomplete="new-password" />
+
+                    <button type="button"
+                            id="togglePassword"
+                            class="password-toggle"
+                            aria-label="Show password">
+
+                        <i id="passwordIcon"
+                           class="bi bi-eye">
+                        </i>
+
+                    </button>
+
+                </div>
+
+                <span asp-validation-for="Password"
+                      class="field-validation-error">
+                </span>
+
+            </div>
+
+            <div class="register-field">
+
+                <label asp-for="ConfirmPassword"
+                       class="form-label">
+                </label>
+
+                <div class="register-input-wrapper">
+
+                    <i class="bi bi-lock-check register-input-icon"></i>
+
+                    <input asp-for="ConfirmPassword"
+                           id="confirmPasswordInput"
+                           class="form-control register-input register-password-input"
+                           placeholder="Confirm password"
+                           autocomplete="new-password" />
+
+                    <button type="button"
+                            id="toggleConfirmPassword"
+                            class="password-toggle"
+                            aria-label="Show password">
+
+                        <i id="confirmPasswordIcon"
+                           class="bi bi-eye">
+                        </i>
+
+                    </button>
+
+                </div>
+
+                <span asp-validation-for="ConfirmPassword"
+                      class="field-validation-error">
+                </span>
+
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary register-submit">
+
+                <span>Create account</span>
+
+                <i class="bi bi-arrow-right"></i>
+
+            </button>
+
+        </form>
+
+        <div class="register-divider"></div>
+
+        <div class="register-login">
+
+            <span>
+                Already have an account?
+            </span>
+
+            <a asp-action="Login">
+                Sign in
+            </a>
+
+        </div>
+
     </div>
 
-    <div>
-        <label asp-for="Name"></label>
-        <input asp-for="Name" />
-        <span asp-validation-for="Name"></span>
-    </div>
-
-    <div>
-        <label asp-for="Surname"></label>
-        <input asp-for="Surname" />
-        <span asp-validation-for="Surname"></span>
-    </div>
-
-    <div>
-        <label asp-for="Password"></label>
-        <input asp-for="Password" />
-        <span asp-validation-for="Password"></span>
-    </div>
-
-    <div>
-        <label asp-for="ConfirmPassword"></label>
-        <input asp-for="ConfirmPassword" />
-        <span asp-validation-for="ConfirmPassword"></span>
-    </div>
-
-    <button type="submit">Register</button>
-</form>
-
-<p>
-    Already have an account?
-    <a asp-action="Login">Login</a>
-</p>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function setupPasswordToggle(
+            inputId,
+            buttonId,
+            iconId) {
+
+            const input =
+                document.getElementById(inputId);
+
+            const button =
+                document.getElementById(buttonId);
+
+            const icon =
+                document.getElementById(iconId);
+
+            button.addEventListener('click', () => {
+
+                const isPassword =
+                    input.type === 'password';
+
+                input.type =
+                    isPassword
+                        ? 'text'
+                        : 'password';
+
+                icon.classList.toggle(
+                    'bi-eye',
+                    !isPassword);
+
+                icon.classList.toggle(
+                    'bi-eye-slash',
+                    isPassword);
+            });
+        }
+
+        setupPasswordToggle(
+            'passwordInput',
+            'togglePassword',
+            'passwordIcon');
+
+        setupPasswordToggle(
+            'confirmPasswordInput',
+            'toggleConfirmPassword',
+            'confirmPasswordIcon');
+    </script>
 }

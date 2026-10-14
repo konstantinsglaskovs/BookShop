@@ -1,10 +1,12 @@
 ﻿using BookShop.Application.Orders.Users.Queries.GetOrderById;
 using BookShop.Application.Orders.Users.Queries.GetUserOrders;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookShop.Web.Controllers
 {
+    [Authorize]
     public class OrderController : Controller
     {
 

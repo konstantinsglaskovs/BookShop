@@ -4,10 +4,12 @@ using BookShop.Application.Orders.Users.Commands.ConfirmPayment;
 using BookShop.Application.Orders.Users.Commands.CreateOrder;
 using BookShop.Web.Models.Checkout;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookShop.Web.Controllers
 {
+    [Authorize]
     public class CheckoutController : Controller
     {
         private readonly IMediator _mediator;

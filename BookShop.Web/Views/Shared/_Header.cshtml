@@ -3,7 +3,7 @@
 
         <div class="site-header__inner">
 
-            <a asp-controller="Books"
+            <a asp-controller="Book"
                asp-action="Index"
                class="site-logo">
 
@@ -12,9 +12,10 @@
                 <span class="site-logo__text">
                     Bookshop
                 </span>
+
             </a>
 
-            <form asp-controller="Books"
+            <form asp-controller="Book"
                   asp-action="Index"
                   method="get"
                   class="site-search">
@@ -38,17 +39,117 @@
 
                 @if (User.Identity?.IsAuthenticated == true)
                 {
-                    <a href="#"
+                    <a asp-controller="Profile"
+                       asp-action="Index"
                        class="site-nav__link">
 
                         <i class="bi bi-person"></i>
 
                         <span>Profile</span>
+
                     </a>
+
+                    <a asp-controller="Order"
+                       asp-action="Index"
+                       class="site-nav__link">
+
+                        <i class="bi bi-receipt"></i>
+
+                        <span>My Orders</span>
+
+                    </a>
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <div class="site-nav__dropdown">
+
+                            <button type="button"
+                                    class="site-nav__link site-nav__button site-nav__dropdown-toggle">
+
+                                <i class="bi bi-gear"></i>
+
+                                <span>Admin</span>
+
+                                <i class="bi bi-chevron-down"></i>
+
+                            </button>
+
+                            <div class="site-nav__dropdown-menu">
+
+                                <a asp-controller="AdminBook"
+                                   asp-action="Index"
+                                   class="site-nav__dropdown-link">
+
+                                    <i class="bi bi-book"></i>
+                                    Books
+
+                                </a>
+
+                                <a asp-controller="AdminOrder"
+                                   asp-action="Index"
+                                   class="site-nav__dropdown-link">
+
+                                    <i class="bi bi-box-seam"></i>
+                                    Orders
+
+                                </a>
+
+                                <a asp-controller="User"
+                                   asp-action="Index"
+                                   class="site-nav__dropdown-link">
+
+                                    <i class="bi bi-people"></i>
+                                    Users
+
+                                </a>
+
+                                <a asp-controller="Category"
+                                   asp-action="Index"
+                                   class="site-nav__dropdown-link">
+
+                                    <i class="bi bi-grid"></i>
+                                    Categories
+
+                                </a>
+
+                                <a asp-controller="Publisher"
+                                   asp-action="Index"
+                                   class="site-nav__dropdown-link">
+
+                                    <i class="bi bi-building"></i>
+                                    Publishers
+
+                                </a>
+
+                                <a asp-controller="Author"
+                                   asp-action="Index"
+                                   class="site-nav__dropdown-link">
+
+                                    <i class="bi bi-person-lines-fill"></i>
+                                    Authors
+
+                                </a>
+
+                                <a asp-controller="Tag"
+                                   asp-action="Index"
+                                   class="site-nav__dropdown-link">
+
+                                    <i class="bi bi-tags"></i>
+                                    Tags
+
+                                </a>
+
+                            </div>
+
+                        </div>
+                    }
+
+                    @await Component.InvokeAsync("CartIcon")
 
                     <form asp-controller="Account"
                           asp-action="Logout"
-                          method="post">
+                          method="post"
+                          class="site-nav__logout-form">
 
                         <button type="submit"
                                 class="site-nav__link site-nav__button">
@@ -56,6 +157,7 @@
                             <i class="bi bi-box-arrow-right"></i>
 
                             <span>Sign out</span>
+
                         </button>
 
                     </form>
@@ -69,10 +171,11 @@
                         <i class="bi bi-person"></i>
 
                         <span>Sign in</span>
-                    </a>
-                }
 
-                @await Component.InvokeAsync("CartIcon")
+                    </a>
+
+                    @await Component.InvokeAsync("CartIcon")
+                }
 
             </nav>
 

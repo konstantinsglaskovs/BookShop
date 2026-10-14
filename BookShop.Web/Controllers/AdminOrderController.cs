@@ -4,10 +4,12 @@ using BookShop.Application.Orders.Admins.Queries.GetAdminOrders;
 using BookShop.Domain.Enums;
 using BookShop.Web.Models.Orders;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookShop.Web.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class AdminOrderController : Controller
     {
         private readonly IMediator _mediator;

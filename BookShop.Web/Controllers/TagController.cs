@@ -4,10 +4,12 @@ using BookShop.Application.Tags.Commands.UpdateTag;
 using BookShop.Application.Tags.Queries.GetTags;
 using BookShop.Web.Models.Tags;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookShop.Web.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class TagController : Controller
     {
         private readonly IMediator _mediator;

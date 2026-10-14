@@ -5,15 +5,16 @@ using BookShop.Application.Books.Dtos;
 using BookShop.Application.Books.Queries.GetAdminBooks;
 using BookShop.Application.Books.Queries.GetBookFilterOptions;
 using BookShop.Application.Books.Queries.GetBookForEdit;
-using BookShop.Application.Books.Queries.GetBooks;
 using BookShop.Application.Сommon.Models;
 using BookShop.Web.Models.Books;
 using BookShop.Web.Validators.Images;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookShop.Web.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class AdminBookController : Controller
     {
         private readonly IMediator _mediator;

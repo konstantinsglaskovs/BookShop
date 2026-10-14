@@ -83,16 +83,23 @@
     font-size: 1.05rem;
 }
 
+.book-details__content {
+    min-width: 0;
+}
+
 .book-details__description-wrapper {
     margin-top: 22px;
+    min-width: 0;
 }
 
 .book-details__description {
-    overflow: hidden;
     max-height: 7.5em;
+    overflow: hidden;
     color: var(--color-text-soft);
     line-height: 1.5;
     white-space: pre-line;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .book-details__description--expanded {

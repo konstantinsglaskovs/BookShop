@@ -5,10 +5,12 @@ using BookShop.Application.Profiles.Queries.GetProfile;
 using BookShop.Web.Models.Profiles;
 using BookShop.Web.Validators.Images;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookShop.Web.Controllers
 {
+    [Authorize]
     public class ProfileController : Controller
     {
         private readonly IMediator _mediator;

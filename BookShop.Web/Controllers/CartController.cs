@@ -3,10 +3,12 @@ using BookShop.Application.Cart.Commands.ChangeCartItemQuantity;
 using BookShop.Application.Cart.Commands.RemoveCartItem;
 using BookShop.Application.Cart.Queries.GetCart;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookShop.Web.Controllers
 {
+    [Authorize]
     public class CartController : Controller
     {
         private readonly IMediator _mediator;

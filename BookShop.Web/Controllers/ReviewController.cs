@@ -1,9 +1,11 @@
 ﻿using BookShop.Application.Reviews.Commands.CreateReview;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookShop.Web.Controllers
 {
+    [Authorize]
     public class ReviewController : Controller
     {
         private readonly IMediator _mediator;

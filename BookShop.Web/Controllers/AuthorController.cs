@@ -5,10 +5,12 @@ using BookShop.Application.Authors.Queries.GetAuthorById;
 using BookShop.Application.Authors.Queries.GetAuthors;
 using BookShop.Web.Models.Authors;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookShop.Web.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class AuthorController : Controller
     {
         private readonly IMediator _mediator;

@@ -6,11 +6,13 @@ using BookShop.Application.Categories.Queries.GetCategories;
 using BookShop.Application.Сommon.Models;
 using BookShop.Web.Models.Categories;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace BookShop.Web.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CategoryController : Controller
     {
         private readonly IMediator _mediator;

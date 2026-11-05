@@ -47,6 +47,8 @@ public class AccountController : Controller
             return View(model);
         }
 
+        TempData["Success"] ="Registration completed successfully. You can now sign in.";
+
         return RedirectToAction(nameof(Login));
     }
 

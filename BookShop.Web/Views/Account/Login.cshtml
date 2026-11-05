@@ -9,6 +9,13 @@
           href="~/css/authorization.css"
           asp-append-version="true" />
 }
+@if (TempData["Success"] is string success)
+{
+    <div id="successAlert"
+         class="alert alert-success">
+        @success
+    </div>
+}
 
 <div class="login-page">
 
@@ -150,5 +157,20 @@
                 'bi-eye-slash',
                 isPassword);
         });
+
+        <script>
+            const successAlert =
+            document.getElementById('successAlert');
+
+            if (successAlert) {
+                setTimeout(() => {
+                    successAlert.classList.add('alert-hide');
+
+                    setTimeout(() => {
+                        successAlert.remove();
+                    }, 300);
+                }, 3000);
+                }
+    </script>
     </script>
 }

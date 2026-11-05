@@ -527,6 +527,24 @@ textarea.form-control {
     color: var(--color-error);
     font-weight: 600;
 }
+.alert {
+    margin: 18px 0;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.alert-success {
+    background: #edf7f0;
+    border: 1px solid #b8ddc4;
+    color: var(--color-success);
+    font-weight: 600;
+}
+
+.alert-hide {
+    opacity: 0;
+    transform: translateY(-6px);
+}
 
 .field-validation-error {
     color: var(--color-error);

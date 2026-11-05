@@ -15,7 +15,10 @@ namespace BookShop.Web.Models.Checkout
         public string RecipientSurname { get; set; } = null!;
 
         [Required]
-        [StringLength(30)]
+        [Phone]
+        [RegularExpression(
+        @"^\+?[0-9\s\-\(\)]{7,20}$",
+        ErrorMessage = "Enter a valid phone number.")]
         public string PhoneNumber { get; set; } = null!;
 
         [Required]
@@ -30,7 +33,7 @@ namespace BookShop.Web.Models.Checkout
         public string? State { get; set; }
 
         [Required]
-        [StringLength(20)]
+        [RegularExpression(@"^((LV-)?\d{4}|LT-\d{5}|\d{5})$",ErrorMessage = "Enter a valid postal code.")]
         public string PostalCode { get; set; } = null!;
 
         [Required]
